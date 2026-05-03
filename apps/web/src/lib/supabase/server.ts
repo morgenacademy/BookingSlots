@@ -9,6 +9,10 @@ export async function getSupabaseServer() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      // Stateless flow so magic-links work across devices. PKCE was the
+      // default and produced pkce_-prefixed tokens that needed a cookie
+      // verifier from the originating browser.
+      auth: { flowType: 'implicit' },
       cookies: {
         getAll: () => cookieStore.getAll(),
         setAll: (toSet: CookieToSet[]) => {
