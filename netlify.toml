@@ -1,0 +1,17 @@
+[build]
+  base = "apps/web"
+  command = "pnpm build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "9"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[headers]]
+  for = "/embed/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=300, s-maxage=300"

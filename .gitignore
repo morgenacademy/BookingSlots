@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+.next
+dist
+build
+.env
+.env.local
+.env*.local
+.DS_Store
+*.log
+coverage
+.turbo
+.netlify
+.vercel
+supabase/.branches
+supabase/.temp
