@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { getSupabaseServer } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -21,6 +22,25 @@ export async function GET(request: NextRequest) {
           },
           { onConflict: 'id', ignoreDuplicates: true }
         );
+
+        // Redeem any pending admin invites for this email.
+        if (user.email) {
+          const admin = getSupabaseAdmin();
+          const { data: invites } = await admin
+            .from('studio_admin_invites')
+            .select('studio_id, role')
+            .eq('email', user.email.toLowerCase());
+          if (invites?.length) {
+            await admin.from('studio_admins').upsert(
+              invites.map((i) => ({ studio_id: i.studio_id, user_id: user.id, role: i.role })),
+              { onConflict: 'studio_id,user_id' }
+            );
+            await admin
+              .from('studio_admin_invites')
+              .delete()
+              .eq('email', user.email.toLowerCase());
+          }
+        }
       }
       return NextResponse.redirect(new URL(next, request.url));
     }

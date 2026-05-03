@@ -28,6 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <li><Link href="/admin/rooms" className="hover:underline">Ruimtes</Link></li>
             <li><Link href="/admin/classes" className="hover:underline">Rooster</Link></li>
             <li className="pl-3"><Link href="/admin/classes/recurring" className="hover:underline text-gray-600">↳ Bulk plannen</Link></li>
+            <li className="pt-3 border-t mt-3"><Link href="/admin/team" className="hover:underline">Team</Link></li>
           </ul>
         </aside>
         <main>{children}</main>
