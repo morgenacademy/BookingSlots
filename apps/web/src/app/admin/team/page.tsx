@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { inviteAdmin, removeAdmin, cancelInvite } from './actions';
@@ -32,8 +33,9 @@ export default async function TeamAdmin({
       <header>
         <h1 className="font-display text-3xl">Team</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Geef collega&apos;s toegang tot het beheerderspaneel. Ze krijgen een magic-link per
-          mail; bij het inloggen worden ze automatisch admin.
+          Beheerders krijgen toegang tot het admin-paneel via een magic-link.
+          Wil je iemand alleen als instructeur toevoegen (eigen lessen + deelnemerslijst)?
+          Doe dat via <Link href="/admin/instructors" className="underline">Instructeurs</Link>.
         </p>
       </header>
 
@@ -52,11 +54,14 @@ export default async function TeamAdmin({
             <select name="role" defaultValue="manager" className="hoe-input w-full">
               <option value="owner">Eigenaar</option>
               <option value="manager">Manager</option>
-              <option value="staff">Medewerker</option>
             </select>
           </label>
           <button className="hoe-btn-sm">Uitnodigen</button>
         </form>
+        <p className="text-xs text-gray-500">
+          <strong>Eigenaar</strong> en <strong>Manager</strong> hebben dezelfde toegang tot alles in admin.
+          Het verschil is alleen labelling — gebruik Eigenaar voor de studio-eigenaar(s) en Manager voor mede-beheerders.
+        </p>
       </section>
 
       <section className="space-y-2">
