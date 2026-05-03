@@ -100,10 +100,23 @@ Studio-id `00000000-0000-0000-0000-000000000001`. Owners zijn Harmen (`harmenvan
 
 End-to-end Mollie test geverifieerd: factuur HOE-2026-00001 (€105 Off Peak 15) heeft credits geleverd. Webhook + factuurnummering werken in productie.
 
-## Wat er nog open ligt
+## Backlog (op volgorde van impact)
 
-- Wachtlijst-mail HTML kan netter (gebruikt nu inline minimal markup).
-- `/account/wachtwoord` route bestaat nog niet — recovery-mails verwijzen ernaartoe maar landen op 404. Pas relevant als wachtwoord-login wordt toegevoegd naast magic-link.
-- Stripe-vs-Mollie keuze staat strategisch nog open — HoE gebruikt nu Mollie test mode.
-- Embed-widget (`public/embed/widget.js`) bestaat maar is niet end-to-end getest in een echte Webflow-pagina.
-- Geen `/admin/studio` voor studio-instellingen (cancel-deadline, off-peak-uren, no-show penalty); die zitten nu nog in seed-data.
+### Blokkerend voor go-live met echte klanten
+- **Lizzy de echte HoE-data laten invullen**: prijzen op `passes`, instructeurs, off-peak-uren, cancel-deadlines. Een paar weken klassen via `/admin/classes/recurring`. Geen code-werk — werksessie met haar in `/admin`.
+- **Bsport-importer**: zodra Lizzy haar Bsport-login deelt, kunnen we members, klassen en lopende strippenkaarten/abonnementen overzetten zodat klanten niet vanaf nul beginnen. Onderzoek welk pad: officiële API (gated achter Bsport agreement, base `api-docs.dev.bsport.io`), CSV-export, of als laatste redmiddel een scrape-script. Schrijf dit als `scripts/import-bsport.ts` met service-role client.
+
+### Belangrijk feature-werk
+- **Instructeur-rol** (Lizzy's vraag: "instructeurs moeten ook kunnen inloggen, hun lessen zien, wie er komt"):
+  1. Migratie: `instructors.user_id` (FK naar `auth.users`) + RLS-policy "instructor reads own classes".
+  2. `/admin/instructors` formulier krijgt e-mail-koppel + invite (zelfde patroon als `/admin/team`).
+  3. Nieuwe `/instructor` route: lijst van eigen aankomende klassen + per klas een attendance-pagina met deelnemerslijst (naam, e-mail, status, no-show-knop).
+  4. Studio-admin layout-check uitbreiden: 'staff'-rol mag alleen `/instructor`, niet de hele `/admin`.
+- **Embed-widget einde-tot-einde** in een echte Webflow-pagina. `public/embed/widget.js` bestaat maar is nooit ingebed getest. Drop-in compatibility met Bsport-mount-IDs is onderdeel van het ontwerp; legacy-shim (`/legacy/bsport/...`) staat al klaar.
+- **`/admin/studio` settings**: cancel-deadline, off-peak window, no-show penalty, default max-waitlist. Zit nu in `studios`-rij maar geen UI.
+
+### Polijst / nice to have
+- Wachtlijst-mail HTML naar dezelfde HoE-stijl als de auth-templates.
+- ICS-export per booking, no-show cron, auto-cancel-underbooked cron (allemaal in plan-document, nog niet gebouwd).
+- Wachtwoord-login als optie naast magic-link → `/account/wachtwoord` route + Supabase password sign-up enabled.
+- Stripe-vs-Mollie strategische beslissing (HoE gebruikt nu Mollie test, Bsport gebruikte Stripe Connect).
