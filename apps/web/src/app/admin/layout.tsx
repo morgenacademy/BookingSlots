@@ -21,14 +21,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <aside className="text-sm space-y-2">
           <h2 className="font-display text-lg mb-2">Admin</h2>
           <ul className="space-y-1">
+            <li className="text-xs uppercase text-gray-400 pt-1">Catalogus</li>
             <li><Link href="/admin/passes" className="hover:underline">Strippenkaarten</Link></li>
             <li><Link href="/admin/subscriptions" className="hover:underline">Abonnementen</Link></li>
             <li><Link href="/admin/activities" className="hover:underline">Lestypes</Link></li>
+            <li className="text-xs uppercase text-gray-400 pt-3">Studio</li>
             <li><Link href="/admin/instructors" className="hover:underline">Instructeurs</Link></li>
             <li><Link href="/admin/rooms" className="hover:underline">Ruimtes</Link></li>
             <li><Link href="/admin/classes" className="hover:underline">Rooster</Link></li>
             <li className="pl-3"><Link href="/admin/classes/recurring" className="hover:underline text-gray-600">↳ Bulk plannen</Link></li>
-            <li className="pt-3 border-t mt-3"><Link href="/admin/team" className="hover:underline">Team</Link></li>
+            <li className="text-xs uppercase text-gray-400 pt-3">Activiteit</li>
+            <li><Link href="/admin/bookings" className="hover:underline">Boekingen</Link></li>
+            <li><Link href="/admin/orders" className="hover:underline">Betalingen</Link></li>
+            <li className="text-xs uppercase text-gray-400 pt-3">Beheer</li>
+            <li><Link href="/admin/team" className="hover:underline">Team</Link></li>
           </ul>
         </aside>
         <main>{children}</main>

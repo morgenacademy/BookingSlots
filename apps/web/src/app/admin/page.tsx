@@ -17,6 +17,9 @@ export default function AdminHome() {
           ['/admin/rooms', 'Ruimtes', 'Reformer-zaal, Mat-zaal, …'],
           ['/admin/classes', 'Rooster', 'Plan klassen in'],
           ['/admin/classes/recurring', 'Bulk plannen', 'Een hele week of maand in één keer'],
+          ['/admin/bookings', 'Boekingen', 'Wie zit in welke les + wachtlijst'],
+          ['/admin/orders', 'Betalingen', 'Mollie-orders, status, factuurnummers'],
+          ['/admin/team', 'Team', 'Andere admins uitnodigen'],
         ].map(([href, title, sub]) => (
           <li key={href}>
             <Link href={href} className="block border rounded-2xl p-5 hover:bg-gray-50">
