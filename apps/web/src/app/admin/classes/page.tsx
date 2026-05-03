@@ -33,8 +33,8 @@ export default async function ClassesAdmin({
 
   return (
     <div className="space-y-6">
-      <header className="flex justify-between items-center">
-        <h1 className="font-display text-3xl">Rooster</h1>
+      <header className="flex justify-between items-center gap-3 flex-wrap">
+        <h1 className="font-display text-2xl sm:text-3xl">Rooster</h1>
         <Link
           href="/admin/classes?new=1"
           className="hoe-btn-sm"

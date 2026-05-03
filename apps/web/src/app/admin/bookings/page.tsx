@@ -50,7 +50,7 @@ export default async function BookingsAdmin({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl">Boekingen</h1>
+        <h1 className="font-display text-2xl sm:text-3xl">Boekingen</h1>
       </header>
 
       <form className="flex gap-3 items-end text-sm flex-wrap">

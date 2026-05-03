@@ -46,7 +46,7 @@ export default async function TeamAdmin({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl">Team</h1>
+        <h1 className="font-display text-2xl sm:text-3xl">Team</h1>
         <p className="text-sm text-gray-600 mt-1">
           Voeg admins (volledig beheer) of instructeurs (eigen lessen + deelnemerslijst) toe.
           Iedereen krijgt een magic-link om zelf in te loggen.

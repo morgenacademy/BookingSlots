@@ -64,7 +64,7 @@ export default async function OrdersAdmin({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl">Betalingen</h1>
+        <h1 className="font-display text-2xl sm:text-3xl">Betalingen</h1>
         <p className="text-sm text-gray-600 mt-1">
           {totals.paidCount} betaalde orders · totaal {fmtEuro(totals.paidCents)}
         </p>

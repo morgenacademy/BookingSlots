@@ -33,7 +33,7 @@ export default async function RecurringPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl">Terugkerende klassen</h1>
+        <h1 className="font-display text-2xl sm:text-3xl">Terugkerende klassen</h1>
         <p className="text-sm text-gray-600 mt-1">
           Genereer in één keer een blok klassen op vaste dagen en tijden.
         </p>

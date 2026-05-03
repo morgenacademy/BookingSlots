@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function AdminHome() {
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-3xl">Beheer</h1>
+      <h1 className="font-display text-2xl sm:text-3xl">Beheer</h1>
       <p className="text-gray-600">
         Stel hier je strippenkaarten, abonnementen, lestypes en rooster in. Wijzigingen
         worden direct zichtbaar op de prijzen- en rooster-pagina én in de embed-widget.

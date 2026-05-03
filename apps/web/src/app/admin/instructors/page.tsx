@@ -29,8 +29,8 @@ export default async function InstructorsAdmin({
 
   return (
     <div className="space-y-6">
-      <header className="flex justify-between items-center">
-        <h1 className="font-display text-3xl">Instructeurs</h1>
+      <header className="flex justify-between items-center gap-3 flex-wrap">
+        <h1 className="font-display text-2xl sm:text-3xl">Instructeurs</h1>
         <Link href="/admin/instructors?new=1" className="hoe-btn-sm">
           + Nieuwe instructeur
         </Link>
@@ -47,20 +47,20 @@ export default async function InstructorsAdmin({
               ? `uitnodiging open (${i.invite_email})`
               : 'nog geen login';
           return (
-            <li key={i.id} className="p-4 flex justify-between items-center gap-4">
-              <div className="flex items-center gap-3">
+            <li key={i.id} className="p-4 flex justify-between items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 {i.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={i.photo_url as string} alt="" className="w-10 h-10 rounded-full object-cover" />
+                  <img src={i.photo_url as string} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-200" />
+                  <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />
                 )}
-                <div>
-                  <div className="font-medium">{i.display_name}</div>
-                  <div className="text-sm text-gray-600">{status}</div>
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{i.display_name}</div>
+                  <div className="text-sm text-gray-600 truncate">{status}</div>
                 </div>
               </div>
-              <div className="flex gap-3 text-sm">
+              <div className="flex gap-3 text-sm shrink-0">
                 <Link href={`/admin/instructors?edit=${i.id}`} className="underline">Bewerk</Link>
                 <form action={deleteInstructor}>
                   <input type="hidden" name="id" value={i.id} />
