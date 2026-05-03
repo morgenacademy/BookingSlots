@@ -10,7 +10,7 @@ export function RoleSwitcher({ surfaces }: { surfaces: Surface[] }) {
   if (surfaces.length < 2) return null;
 
   return (
-    <div className="hidden md:inline-flex border border-hoe-line rounded-full p-0.5 bg-white">
+    <div className="inline-flex border border-hoe-line rounded-full p-0.5 bg-white">
       {surfaces.map((s) => {
         const active = pathname === s.href || pathname.startsWith(s.href + '/');
         return (
@@ -18,7 +18,7 @@ export function RoleSwitcher({ surfaces }: { surfaces: Surface[] }) {
             key={s.href}
             href={s.href}
             className={
-              'px-3 py-1 rounded-full text-xs uppercase tracking-wider transition-colors ' +
+              'px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs uppercase tracking-wider transition-colors ' +
               (active
                 ? 'bg-hoe-fg text-white'
                 : 'text-hoe-muted hover:text-hoe-brown')
