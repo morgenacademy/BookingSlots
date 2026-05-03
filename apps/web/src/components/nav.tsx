@@ -2,28 +2,33 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/login/actions';
+import { RoleSwitcher } from './role-switcher';
 
 export async function Nav() {
   const t = await getTranslations('nav');
   const supabase = await getSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
 
-  let surface: 'admin' | 'instructor' | null = null;
+  // Every authed user is a customer; admin and instructor surfaces are
+  // additive based on their links.
+  const surfaces: Array<{ href: string; label: string }> = [];
   if (user) {
-    const { data: adminRow } = await supabase
-      .from('studio_admins')
-      .select('role')
-      .eq('user_id', user.id)
-      .in('role', ['owner', 'manager'])
-      .maybeSingle();
-    if (adminRow) surface = 'admin';
-    else {
-      const { count: instr } = await supabase
+    surfaces.push({ href: '/account', label: 'Klant' });
+
+    const [{ count: instr }, { data: adm }] = await Promise.all([
+      supabase
         .from('instructors')
         .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-      if (instr) surface = 'instructor';
-    }
+        .eq('user_id', user.id),
+      supabase
+        .from('studio_admins')
+        .select('role')
+        .eq('user_id', user.id)
+        .in('role', ['owner', 'manager'])
+        .maybeSingle(),
+    ]);
+    if (instr) surfaces.push({ href: '/instructor', label: 'Instructeur' });
+    if (adm) surfaces.push({ href: '/admin', label: 'Admin' });
   }
 
   return (
@@ -38,19 +43,12 @@ export async function Nav() {
       <div className="flex gap-4 items-center text-sm">
         {user ? (
           <>
-            {surface === 'admin' && (
-              <Link href="/admin" className="hidden md:inline text-hoe-muted hover:text-hoe-brown">
-                Admin
+            <RoleSwitcher surfaces={surfaces} />
+            {surfaces.length < 2 && (
+              <Link href="/account" className="hoe-btn-ghost">
+                {t('account')}
               </Link>
             )}
-            {surface === 'instructor' && (
-              <Link href="/instructor" className="hidden md:inline text-hoe-muted hover:text-hoe-brown">
-                Instructeur
-              </Link>
-            )}
-            <Link href="/account" className="hoe-btn-ghost">
-              {t('account')}
-            </Link>
             <form action={logout}>
               <button type="submit" className="text-hoe-muted hover:text-hoe-brown">
                 {t('logout')}

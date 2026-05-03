@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get('code');
   const tokenHash = url.searchParams.get('token_hash');
   const type = url.searchParams.get('type') as EmailOtpType | null;
-  const next = url.searchParams.get('next') ?? '/account';
+  const explicitNext = url.searchParams.get('next');
 
   const supabase = await getSupabaseServer();
 
@@ -70,5 +70,24 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL(next, request.url));
+  // Land users on their highest-privilege surface unless ?next= was set
+  // explicitly (eg. invite emails specify next=/instructor or /admin).
+  let next = explicitNext;
+  if (!next && user) {
+    const [{ data: adm }, { count: instr }] = await Promise.all([
+      supabase
+        .from('studio_admins')
+        .select('role')
+        .eq('user_id', user.id)
+        .in('role', ['owner', 'manager'])
+        .maybeSingle(),
+      supabase
+        .from('instructors')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id),
+    ]);
+    next = adm ? '/admin' : instr ? '/instructor' : '/account';
+  }
+
+  return NextResponse.redirect(new URL(next ?? '/account', request.url));
 }
