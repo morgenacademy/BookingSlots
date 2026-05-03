@@ -13,7 +13,10 @@ export default function AdminHome() {
           ['/admin/passes', 'Strippenkaarten', 'Off Peak 15, Bundel 30, Bundel 60, …'],
           ['/admin/subscriptions', 'Abonnementen', 'Starter, Flex, …'],
           ['/admin/activities', 'Lestypes', 'Reformer, Barre, Yoga, DUO'],
+          ['/admin/instructors', 'Instructeurs', 'Wie geeft de les'],
+          ['/admin/rooms', 'Ruimtes', 'Reformer-zaal, Mat-zaal, …'],
           ['/admin/classes', 'Rooster', 'Plan klassen in'],
+          ['/admin/classes/recurring', 'Bulk plannen', 'Een hele week of maand in één keer'],
         ].map(([href, title, sub]) => (
           <li key={href}>
             <Link href={href} className="block border rounded-2xl p-5 hover:bg-gray-50">
