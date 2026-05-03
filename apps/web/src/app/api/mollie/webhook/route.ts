@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { PaymentStatus } from '@mollie/api-client';
 import { addDays } from '@/lib/date';
 import { mollie } from '@/lib/mollie';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   const meta = payment.metadata as Record<string, string> | null;
 
   // Subscription first-payment: create mandate + subscription
-  if (meta?.kind === 'subscription_first' && payment.status === 'paid') {
+  if (meta?.kind === 'subscription_first' && payment.status === PaymentStatus.paid) {
     const subId = meta.subscription_template_id;
     const { data: sub } = await admin
       .from('subscriptions')
@@ -67,10 +68,15 @@ export async function POST(req: NextRequest) {
   const orderId = meta?.order_id;
   if (!orderId) return NextResponse.json({ ok: true });
 
+  const failedStates: PaymentStatus[] = [
+    PaymentStatus.failed,
+    PaymentStatus.expired,
+    PaymentStatus.canceled,
+  ];
   const status =
-    payment.status === 'paid'
+    payment.status === PaymentStatus.paid
       ? 'paid'
-      : ['failed', 'expired', 'canceled'].includes(payment.status)
+      : failedStates.includes(payment.status)
         ? 'failed'
         : 'pending';
 
@@ -78,11 +84,11 @@ export async function POST(req: NextRequest) {
     .from('orders')
     .update({
       status,
-      paid_at: payment.status === 'paid' ? new Date().toISOString() : null,
+      paid_at: payment.status === PaymentStatus.paid ? new Date().toISOString() : null,
     })
     .eq('id', orderId);
 
-  if (payment.status === 'paid') {
+  if (payment.status === PaymentStatus.paid) {
     // Materialise pass purchase → user_passes
     const { data: items } = await admin
       .from('order_items')

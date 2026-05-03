@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { PaymentMethod } from '@mollie/api-client';
+import { PaymentMethod, SequenceType } from '@mollie/api-client';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { mollie, siteUrl } from '@/lib/mollie';
@@ -110,7 +110,7 @@ export async function subscribe(formData: FormData) {
     customerId,
     amount: { currency: 'EUR', value: (sub.price_eur_cents / 100).toFixed(2) },
     description: `${sub.name} — eerste betaling`,
-    sequenceType: 'first',
+    sequenceType: SequenceType.first,
     redirectUrl: `${siteUrl()}/checkout/return?subscription=${sub.id}`,
     webhookUrl: `${siteUrl()}/api/mollie/webhook`,
     metadata: { subscription_template_id: sub.id, kind: 'subscription_first' },
