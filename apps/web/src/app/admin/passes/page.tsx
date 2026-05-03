@@ -76,7 +76,7 @@ function PassForm({ pass }: { pass: Record<string, unknown> | null }) {
   const v = (k: string) => (pass ? String(pass[k] ?? '') : '');
   const cents = pass ? Number(pass.price_eur_cents) / 100 : '';
   return (
-    <form action={savePass} className="grid grid-cols-2 gap-4 text-sm">
+    <form action={savePass} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       {pass && <input type="hidden" name="id" value={String(pass.id)} />}
       <label className="flex flex-col gap-1">
         Naam

@@ -8,7 +8,7 @@ export default function AdminHome() {
         Stel hier je strippenkaarten, abonnementen, lestypes en rooster in. Wijzigingen
         worden direct zichtbaar op de prijzen- en rooster-pagina én in de embed-widget.
       </p>
-      <ul className="grid grid-cols-2 gap-4">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {[
           ['/admin/passes', 'Strippenkaarten', 'Off Peak 15, Bundel 30, Bundel 60, …'],
           ['/admin/subscriptions', 'Abonnementen', 'Starter, Flex, …'],

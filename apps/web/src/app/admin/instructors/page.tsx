@@ -133,7 +133,7 @@ function InstructorForm({ ins }: { ins: Record<string, unknown> | null }) {
   const isNew = !ins;
   const photoUrl = ins?.photo_url as string | null | undefined;
   return (
-    <form action={saveInstructor} className="grid grid-cols-2 gap-4 text-sm">
+    <form action={saveInstructor} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       {ins && <input type="hidden" name="id" value={String(ins.id)} />}
       <label className="flex flex-col gap-1 col-span-2">
         Naam

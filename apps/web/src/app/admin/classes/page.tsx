@@ -111,7 +111,7 @@ function ClassForm({
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
   return (
-    <form action={saveClass} className="grid grid-cols-2 gap-4 text-sm">
+    <form action={saveClass} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       {cls && <input type="hidden" name="id" value={String(cls.id)} />}
       <label className="flex flex-col gap-1">
         Lestype

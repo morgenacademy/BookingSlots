@@ -26,27 +26,27 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <>
       <Nav />
-      <div className="mx-auto max-w-6xl px-6 py-8 grid grid-cols-[200px_1fr] gap-8">
-        <aside className="text-sm space-y-2">
-          <h2 className="font-display text-lg mb-2">Admin</h2>
-          <ul className="space-y-1">
-            <li className="text-xs uppercase text-gray-400 pt-1">Catalogus</li>
-            <li><Link href="/admin/passes" className="hover:underline">Strippenkaarten</Link></li>
-            <li><Link href="/admin/subscriptions" className="hover:underline">Abonnementen</Link></li>
-            <li><Link href="/admin/activities" className="hover:underline">Lestypes</Link></li>
-            <li className="text-xs uppercase text-gray-400 pt-3">Studio</li>
-            <li><Link href="/admin/instructors" className="hover:underline">Instructeurs</Link></li>
-            <li><Link href="/admin/rooms" className="hover:underline">Ruimtes</Link></li>
-            <li><Link href="/admin/classes" className="hover:underline">Rooster</Link></li>
-            <li className="pl-3"><Link href="/admin/classes/recurring" className="hover:underline text-gray-600">↳ Bulk plannen</Link></li>
-            <li className="text-xs uppercase text-gray-400 pt-3">Activiteit</li>
-            <li><Link href="/admin/bookings" className="hover:underline">Boekingen</Link></li>
-            <li><Link href="/admin/orders" className="hover:underline">Betalingen</Link></li>
-            <li className="text-xs uppercase text-gray-400 pt-3">Beheer</li>
-            <li><Link href="/admin/team" className="hover:underline">Team</Link></li>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8 md:grid md:grid-cols-[200px_1fr] md:gap-8 space-y-6 md:space-y-0">
+        <aside className="text-sm">
+          <h2 className="font-display text-lg mb-2 hidden md:block">Admin</h2>
+          <ul className="flex md:block gap-x-4 gap-y-1 flex-wrap md:space-y-1 -mx-1 md:mx-0">
+            <li className="hidden md:block text-xs uppercase text-gray-400 pt-1">Catalogus</li>
+            <li><Link href="/admin/passes" className="hover:underline px-1 md:px-0">Strippenkaarten</Link></li>
+            <li><Link href="/admin/subscriptions" className="hover:underline px-1 md:px-0">Abonnementen</Link></li>
+            <li><Link href="/admin/activities" className="hover:underline px-1 md:px-0">Lestypes</Link></li>
+            <li className="hidden md:block text-xs uppercase text-gray-400 pt-3">Studio</li>
+            <li><Link href="/admin/instructors" className="hover:underline px-1 md:px-0">Instructeurs</Link></li>
+            <li><Link href="/admin/rooms" className="hover:underline px-1 md:px-0">Ruimtes</Link></li>
+            <li><Link href="/admin/classes" className="hover:underline px-1 md:px-0">Rooster</Link></li>
+            <li className="md:pl-3"><Link href="/admin/classes/recurring" className="hover:underline text-gray-600 px-1 md:px-0">↳ Bulk plannen</Link></li>
+            <li className="hidden md:block text-xs uppercase text-gray-400 pt-3">Activiteit</li>
+            <li><Link href="/admin/bookings" className="hover:underline px-1 md:px-0">Boekingen</Link></li>
+            <li><Link href="/admin/orders" className="hover:underline px-1 md:px-0">Betalingen</Link></li>
+            <li className="hidden md:block text-xs uppercase text-gray-400 pt-3">Beheer</li>
+            <li><Link href="/admin/team" className="hover:underline px-1 md:px-0">Team</Link></li>
           </ul>
         </aside>
-        <main>{children}</main>
+        <main className="min-w-0">{children}</main>
       </div>
     </>
   );

@@ -67,7 +67,7 @@ export default async function RoomsAdmin({
 function RoomForm({ room }: { room: Record<string, unknown> | null }) {
   const v = (k: string) => (room ? String(room[k] ?? '') : '');
   return (
-    <form action={saveRoom} className="grid grid-cols-2 gap-4 text-sm">
+    <form action={saveRoom} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       {room && <input type="hidden" name="id" value={String(room.id)} />}
       <label className="flex flex-col gap-1">
         Naam

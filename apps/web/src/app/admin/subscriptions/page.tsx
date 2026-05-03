@@ -71,7 +71,7 @@ function SubForm({ sub }: { sub: Record<string, unknown> | null }) {
   const v = (k: string) => (sub ? String(sub[k] ?? '') : '');
   const cents = sub ? Number(sub.price_eur_cents) / 100 : '';
   return (
-    <form action={saveSubscription} className="grid grid-cols-2 gap-4 text-sm">
+    <form action={saveSubscription} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       {sub && <input type="hidden" name="id" value={String(sub.id)} />}
       <label className="flex flex-col gap-1">
         Naam<input name="name" required defaultValue={v('name')} className="hoe-input w-full" />

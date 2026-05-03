@@ -66,7 +66,7 @@ export default async function ActivitiesAdmin({
 function ActivityForm({ act }: { act: Record<string, unknown> | null }) {
   const v = (k: string) => (act ? String(act[k] ?? '') : '');
   return (
-    <form action={saveActivity} className="grid grid-cols-2 gap-4 text-sm">
+    <form action={saveActivity} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       {act && <input type="hidden" name="id" value={String(act.id)} />}
       <label className="flex flex-col gap-1">
         Naam<input name="name" required defaultValue={v('name')} className="hoe-input w-full" />

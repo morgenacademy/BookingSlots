@@ -39,7 +39,7 @@ export default async function RecurringPage() {
         </p>
       </header>
 
-      <form action={generateRecurring} className="grid grid-cols-2 gap-4 text-sm border rounded-2xl p-6">
+      <form action={generateRecurring} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm border rounded-2xl p-6">
         <label className="flex flex-col gap-1">
           Lestype
           <select name="activity_id" required className="hoe-input w-full">
