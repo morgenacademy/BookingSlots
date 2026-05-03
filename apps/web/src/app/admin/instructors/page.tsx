@@ -36,7 +36,8 @@ export default async function InstructorsAdmin({
         </Link>
       </header>
 
-      {sp.invited && <p className="hoe-callout">Uitnodiging verstuurd.</p>}
+      {sp.invited && <p className="hoe-callout">Uitnodiging verstuurd / instructeur gekoppeld.</p>}
+      {sp.err === 'email' && <p className="hoe-callout text-red-700">E-mail is verplicht voor een nieuwe instructeur — daarmee koppelen we het account.</p>}
 
       <ul className="border rounded-2xl divide-y">
         {items?.map((i) => {
@@ -46,10 +47,18 @@ export default async function InstructorsAdmin({
               ? `uitnodiging open (${i.invite_email})`
               : 'nog geen login';
           return (
-            <li key={i.id} className="p-4 flex justify-between items-center">
-              <div>
-                <div className="font-medium">{i.display_name}</div>
-                <div className="text-sm text-gray-600">{status}</div>
+            <li key={i.id} className="p-4 flex justify-between items-center gap-4">
+              <div className="flex items-center gap-3">
+                {i.photo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={i.photo_url as string} alt="" className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-200" />
+                )}
+                <div>
+                  <div className="font-medium">{i.display_name}</div>
+                  <div className="text-sm text-gray-600">{status}</div>
+                </div>
               </div>
               <div className="flex gap-3 text-sm">
                 <Link href={`/admin/instructors?edit=${i.id}`} className="underline">Bewerk</Link>
@@ -121,6 +130,8 @@ export default async function InstructorsAdmin({
 
 function InstructorForm({ ins }: { ins: Record<string, unknown> | null }) {
   const v = (k: string) => (ins ? String(ins[k] ?? '') : '');
+  const isNew = !ins;
+  const photoUrl = ins?.photo_url as string | null | undefined;
   return (
     <form action={saveInstructor} className="grid grid-cols-2 gap-4 text-sm">
       {ins && <input type="hidden" name="id" value={String(ins.id)} />}
@@ -130,15 +141,40 @@ function InstructorForm({ ins }: { ins: Record<string, unknown> | null }) {
           className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1 col-span-2">
+        E-mail {isNew && <span className="text-red-700">*</span>}
+        <input name="email" type="email" required={isNew}
+          placeholder={isNew ? 'verplicht voor nieuwe instructeur' : 'leeg laten om koppeling niet te wijzigen'}
+          className="hoe-input w-full" />
+        <span className="text-xs text-gray-500">
+          Bestaat dit e-mailadres al als klant of admin? Dan wordt dat account ook instructeur.
+          Anders sturen we een magic-link uitnodiging.
+        </span>
+      </label>
+      <label className="flex flex-col gap-1 col-span-2">
         Bio
         <textarea name="bio" rows={3} defaultValue={v('bio')}
           className="hoe-input w-full" />
       </label>
-      <label className="flex flex-col gap-1 col-span-2">
-        Foto-URL
-        <input name="photo_url" type="url" defaultValue={v('photo_url')}
-          className="hoe-input w-full" />
-      </label>
+      <div className="col-span-2 flex items-start gap-4">
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photoUrl} alt="" className="w-20 h-20 rounded-full object-cover border" />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-gray-200" />
+        )}
+        <div className="flex-1 space-y-2">
+          <label className="flex flex-col gap-1">
+            Foto uploaden
+            <input name="photo" type="file" accept="image/*" className="text-sm" />
+          </label>
+          {photoUrl && (
+            <label className="flex items-center gap-2 text-xs text-gray-600">
+              <input type="checkbox" name="remove_photo" />
+              Huidige foto verwijderen
+            </label>
+          )}
+        </div>
+      </div>
       <div className="col-span-2">
         <button className="hoe-btn-sm">Opslaan</button>
       </div>
