@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { PaymentStatus } from '@mollie/api-client';
+import { PaymentStatus, type Payment } from '@mollie/api-client';
 import { addDays } from '@/lib/date';
 import { mollie } from '@/lib/mollie';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
@@ -38,9 +38,8 @@ export async function POST(req: NextRequest) {
 }
 
 type Admin = ReturnType<typeof getSupabaseAdmin>;
-type MolliePayment = Awaited<ReturnType<ReturnType<typeof mollie>['payments']['get']>>;
 
-async function handleOrderPayment(payment: MolliePayment, orderId: string, admin: Admin) {
+async function handleOrderPayment(payment: Payment, orderId: string, admin: Admin) {
   const failed: PaymentStatus[] = [
     PaymentStatus.failed,
     PaymentStatus.expired,
@@ -130,7 +129,7 @@ async function handleOrderPayment(payment: MolliePayment, orderId: string, admin
 }
 
 async function handleSubscriptionFirst(
-  payment: MolliePayment,
+  payment: Payment,
   meta: Record<string, string>,
   admin: Admin
 ) {
@@ -198,7 +197,7 @@ async function handleSubscriptionFirst(
   }
 }
 
-async function handleSubscriptionRenewal(payment: MolliePayment, admin: Admin) {
+async function handleSubscriptionRenewal(payment: Payment, admin: Admin) {
   if (payment.status !== PaymentStatus.paid) return;
 
   const { data: userSub } = await admin
