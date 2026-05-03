@@ -1,5 +1,6 @@
-// Minimal Mailjet REST wrapper. If env vars are missing we log instead of
-// throwing so the surrounding business logic doesn't break in dev.
+// Resend transactional sender. If env vars are missing we log and return
+// instead of throwing so the surrounding business logic doesn't break in
+// dev or before secrets are wired up.
 type SendArgs = {
   to: string;
   toName?: string;
@@ -9,38 +10,35 @@ type SendArgs = {
 };
 
 export async function sendMail({ to, toName, subject, html, text }: SendArgs) {
-  const apiKey = process.env.MAILJET_API_KEY;
-  const apiSecret = process.env.MAILJET_API_SECRET;
+  const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.MAIL_FROM_EMAIL;
   const fromName = process.env.MAIL_FROM_NAME ?? 'House of Eve';
 
-  if (!apiKey || !apiSecret || !fromEmail) {
-    console.warn('[mailer] skipping send — Mailjet env vars missing', { to, subject });
+  if (!apiKey || !fromEmail) {
+    console.warn('[mailer] skipping send — RESEND_API_KEY or MAIL_FROM_EMAIL missing', {
+      to,
+      subject,
+    });
     return { skipped: true as const };
   }
 
-  const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
-  const res = await fetch('https://api.mailjet.com/v3.1/send', {
+  const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      Authorization: `Basic ${auth}`,
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      Messages: [
-        {
-          From: { Email: fromEmail, Name: fromName },
-          To: [{ Email: to, Name: toName ?? to }],
-          Subject: subject,
-          HTMLPart: html,
-          TextPart: text ?? html.replace(/<[^>]+>/g, ''),
-        },
-      ],
+      from: `${fromName} <${fromEmail}>`,
+      to: toName ? [`${toName} <${to}>`] : [to],
+      subject,
+      html,
+      text: text ?? html.replace(/<[^>]+>/g, ''),
     }),
   });
 
   if (!res.ok) {
-    console.error('[mailer] mailjet failed', res.status, await res.text());
+    console.error('[mailer] resend failed', res.status, await res.text());
     return { skipped: false as const, ok: false };
   }
   return { skipped: false as const, ok: true };
