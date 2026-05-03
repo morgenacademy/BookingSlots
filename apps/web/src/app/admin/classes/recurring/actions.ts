@@ -16,6 +16,9 @@ export async function generateRecurring(formData: FormData) {
   const time = String(formData.get('time')); // "HH:MM"
   const duration = Number(formData.get('duration_minutes'));
   const isOffPeak = formData.get('is_off_peak') === 'on';
+  const maxWaitlist = formData.get('max_waitlist')
+    ? Number(formData.get('max_waitlist'))
+    : null;
   const startDate = new Date(String(formData.get('start_date')));
   const endDate = new Date(String(formData.get('end_date')));
 
@@ -32,6 +35,7 @@ export async function generateRecurring(formData: FormData) {
     starts_at: string;
     ends_at: string;
     is_off_peak: boolean;
+    max_waitlist: number | null;
   }> = [];
 
   for (
@@ -52,6 +56,7 @@ export async function generateRecurring(formData: FormData) {
       starts_at: start.toISOString(),
       ends_at: end.toISOString(),
       is_off_peak: isOffPeak,
+      max_waitlist: maxWaitlist,
     });
   }
 

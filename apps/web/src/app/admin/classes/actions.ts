@@ -18,6 +18,9 @@ export async function saveClass(formData: FormData) {
     starts_at: new Date(String(formData.get('starts_at'))).toISOString(),
     ends_at: new Date(String(formData.get('ends_at'))).toISOString(),
     is_off_peak: formData.get('is_off_peak') === 'on',
+    max_waitlist: formData.get('max_waitlist')
+      ? Number(formData.get('max_waitlist'))
+      : null,
   };
   if (id) await supabase.from('classes').update(row).eq('id', id);
   else await supabase.from('classes').insert(row);

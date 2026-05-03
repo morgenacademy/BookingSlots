@@ -1,9 +1,12 @@
 'use server';
 
+import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { sendMail } from '@/lib/mailer';
+import { siteUrl } from '@/lib/mollie';
 
 export async function bookClass(formData: FormData) {
   const classId = String(formData.get('class_id'));
@@ -98,9 +101,8 @@ export async function cancelBooking(formData: FormData) {
   const { data: b } = await admin
     .from('bookings')
     .select(`
-      id, user_id, status, credits_used, user_pass_id,
-      class:classes(starts_at, studio_id),
-      class_studio:classes(studio_id)
+      id, user_id, status, credits_used, user_pass_id, class_id,
+      class:classes(starts_at, studio_id)
     `)
     .eq('id', bookingId)
     .single();
@@ -123,6 +125,9 @@ export async function cancelBooking(formData: FormData) {
     .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
     .eq('id', bookingId);
 
+  // Fan out waitlist invites for the freed seat.
+  await notifyWaitlist(b.class_id, admin);
+
   if (inTime && b.user_pass_id) {
     const { data: up } = await admin
       .from('user_passes')
@@ -140,4 +145,103 @@ export async function cancelBooking(formData: FormData) {
   revalidatePath('/account');
   revalidatePath('/rooster');
   redirect('/account');
+}
+
+export async function joinWaitlist(formData: FormData) {
+  const classId = String(formData.get('class_id'));
+  const supabase = await getSupabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/login?next=${encodeURIComponent('/rooster')}`);
+
+  const admin = getSupabaseAdmin();
+
+  const { data: cls } = await admin
+    .from('classes')
+    .select('id, studio_id, max_waitlist')
+    .eq('id', classId)
+    .single();
+  if (!cls) redirect('/rooster?error=notfound');
+
+  const { data: studio } = await admin
+    .from('studios')
+    .select('default_max_waitlist')
+    .eq('id', cls.studio_id)
+    .single();
+  const cap = cls.max_waitlist ?? studio?.default_max_waitlist ?? 10;
+
+  const { count: current } = await admin
+    .from('bookings')
+    .select('id', { count: 'exact', head: true })
+    .eq('class_id', classId)
+    .eq('status', 'waitlisted');
+  if ((current ?? 0) >= cap) redirect('/rooster?error=waitlist_full');
+
+  const { error } = await admin.from('bookings').insert({
+    studio_id: cls.studio_id,
+    user_id: user.id,
+    class_id: classId,
+    status: 'waitlisted',
+    credits_used: 0,
+    waitlist_position: (current ?? 0) + 1,
+  });
+  if (error) redirect('/rooster?error=waitlist');
+
+  revalidatePath('/rooster');
+  revalidatePath('/account');
+  redirect('/rooster?waitlisted=1');
+}
+
+async function notifyWaitlist(classId: string, admin: ReturnType<typeof getSupabaseAdmin>) {
+  const { data: cls } = await admin
+    .from('classes')
+    .select('starts_at, capacity, activity:activities(name)')
+    .eq('id', classId)
+    .single();
+  if (!cls) return;
+  const activity = Array.isArray(cls.activity) ? cls.activity[0] : cls.activity;
+
+  const { count: bookedCount } = await admin
+    .from('bookings')
+    .select('id', { count: 'exact', head: true })
+    .eq('class_id', classId)
+    .eq('status', 'booked');
+  if ((bookedCount ?? 0) >= cls.capacity) return; // no seat actually free
+
+  const { data: waiting } = await admin
+    .from('bookings')
+    .select('id, user_id, profiles:profiles!bookings_user_id_fkey(email, first_name)')
+    .eq('class_id', classId)
+    .eq('status', 'waitlisted')
+    .order('waitlist_position', { ascending: true });
+  if (!waiting?.length) return;
+
+  const invitedAt = new Date().toISOString();
+  const startsAt = new Date(cls.starts_at).toLocaleString('nl-NL', {
+    weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+  });
+
+  for (const w of waiting) {
+    const token = randomUUID();
+    await admin
+      .from('bookings')
+      .update({ waitlist_invite_token: token, waitlist_invited_at: invitedAt })
+      .eq('id', w.id);
+
+    const profile = Array.isArray(w.profiles) ? w.profiles[0] : w.profiles;
+    if (!profile?.email) continue;
+
+    const claimUrl = `${siteUrl()}/waitlist/claim?b=${w.id}&t=${token}`;
+    await sendMail({
+      to: profile.email,
+      toName: profile.first_name ?? undefined,
+      subject: `Plek vrij voor ${activity?.name ?? 'je les'} — ${startsAt}`,
+      html: `
+        <p>Hi ${profile.first_name ?? ''},</p>
+        <p>Er is een plek vrijgekomen voor <strong>${activity?.name ?? 'je les'}</strong> op
+        <strong>${startsAt}</strong>. Wie het eerst klikt, heeft de plek:</p>
+        <p><a href="${claimUrl}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;border-radius:8px">Claim mijn plek</a></p>
+        <p>Als de plek al weg is laten we dat weten zodra je klikt.</p>
+      `,
+    });
+  }
 }

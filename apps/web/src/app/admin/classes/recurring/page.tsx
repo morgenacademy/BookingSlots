@@ -104,6 +104,10 @@ export default async function RecurringPage() {
           <input type="checkbox" name="is_off_peak" />
           Daluren
         </label>
+        <label className="flex flex-col gap-1 col-span-2">
+          Max wachtlijst (leeg = studio-default)
+          <input name="max_waitlist" type="number" className="border rounded px-2 py-1" />
+        </label>
         <div className="col-span-2">
           <button className="hoe-btn-primary !w-auto px-4 py-2">Genereer</button>
         </div>

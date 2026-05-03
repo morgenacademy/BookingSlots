@@ -153,6 +153,11 @@ function ClassForm({
         <input type="checkbox" name="is_off_peak" defaultChecked={Boolean(cls?.is_off_peak)} />
         Daluren
       </label>
+      <label className="flex flex-col gap-1">
+        Max wachtlijst (leeg = studio-default)
+        <input name="max_waitlist" type="number" defaultValue={v('max_waitlist')}
+          className="border rounded px-2 py-1" />
+      </label>
       <div className="col-span-2">
         <button className="hoe-btn-primary !w-auto px-4 py-2">Opslaan</button>
       </div>
