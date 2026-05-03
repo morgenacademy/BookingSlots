@@ -25,7 +25,7 @@ export default async function InstructorsAdmin({
         <h1 className="font-display text-3xl">Instructeurs</h1>
         <Link
           href="/admin/instructors?new=1"
-          className="hoe-btn-primary !w-auto px-4 py-2 text-sm"
+          className="hoe-btn-sm"
         >
           + Nieuwe instructeur
         </Link>
@@ -72,20 +72,20 @@ function InstructorForm({ ins }: { ins: Record<string, unknown> | null }) {
       <label className="flex flex-col gap-1 col-span-2">
         Naam
         <input name="display_name" required defaultValue={v('display_name')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1 col-span-2">
         Bio
         <textarea name="bio" rows={3} defaultValue={v('bio')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1 col-span-2">
         Foto-URL
         <input name="photo_url" type="url" defaultValue={v('photo_url')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <div className="col-span-2">
-        <button className="hoe-btn-primary !w-auto px-4 py-2">Opslaan</button>
+        <button className="hoe-btn-sm">Opslaan</button>
       </div>
     </form>
   );

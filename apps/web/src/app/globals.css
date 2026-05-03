@@ -61,6 +61,29 @@ h1, h2, h3, .font-display {
   }
   .hoe-btn-ghost:hover { background: var(--hoe-brown); color: #fff; }
 
+  /* Admin / form controls — pin every input, select, textarea and inline
+     button to the same height so rows align in flex layouts. */
+  .hoe-input {
+    @apply h-10 px-3 border rounded-lg text-sm bg-white;
+    border-color: var(--hoe-line);
+  }
+  .hoe-input:focus { outline: 2px solid var(--hoe-brown); outline-offset: 1px; }
+  textarea.hoe-input { @apply h-auto py-2; }
+
+  .hoe-btn-sm {
+    @apply inline-flex items-center justify-center h-10 px-5 rounded-full text-sm font-medium whitespace-nowrap;
+    background: var(--hoe-brown);
+    color: #fff;
+    transition: background .2s ease;
+  }
+  .hoe-btn-sm:hover { background: var(--hoe-brown-dk); }
+
+  .hoe-btn-sm-ghost {
+    @apply inline-flex items-center justify-center h-10 px-5 rounded-full text-sm border bg-white whitespace-nowrap;
+    border-color: var(--hoe-line);
+  }
+  .hoe-btn-sm-ghost:hover { background: #f7f3ee; }
+
   .hoe-price {
     font-family: 'Playfair Display', serif;
     font-size: 3rem;

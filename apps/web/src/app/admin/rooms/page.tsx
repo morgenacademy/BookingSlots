@@ -25,7 +25,7 @@ export default async function RoomsAdmin({
         <h1 className="font-display text-3xl">Ruimtes</h1>
         <Link
           href="/admin/rooms?new=1"
-          className="hoe-btn-primary !w-auto px-4 py-2 text-sm"
+          className="hoe-btn-sm"
         >
           + Nieuwe ruimte
         </Link>
@@ -72,15 +72,15 @@ function RoomForm({ room }: { room: Record<string, unknown> | null }) {
       <label className="flex flex-col gap-1">
         Naam
         <input name="name" required defaultValue={v('name')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Capaciteit
         <input name="capacity" type="number" required defaultValue={v('capacity') || '12'}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <div className="col-span-2">
-        <button className="hoe-btn-primary !w-auto px-4 py-2">Opslaan</button>
+        <button className="hoe-btn-sm">Opslaan</button>
       </div>
     </form>
   );

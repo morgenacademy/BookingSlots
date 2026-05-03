@@ -45,17 +45,17 @@ export default async function TeamAdmin({
         <form action={inviteAdmin} className="flex gap-3 items-end flex-wrap text-sm">
           <label className="flex flex-col gap-1 flex-1 min-w-[240px]">
             E-mail
-            <input name="email" type="email" required className="border rounded px-2 py-1" />
+            <input name="email" type="email" required className="hoe-input w-full" />
           </label>
           <label className="flex flex-col gap-1">
             Rol
-            <select name="role" defaultValue="manager" className="border rounded px-2 py-1">
+            <select name="role" defaultValue="manager" className="hoe-input w-full">
               <option value="owner">Eigenaar</option>
               <option value="manager">Manager</option>
               <option value="staff">Medewerker</option>
             </select>
           </label>
-          <button className="hoe-btn-primary !w-auto px-4 py-2">Uitnodigen</button>
+          <button className="hoe-btn-sm">Uitnodigen</button>
         </form>
       </section>
 

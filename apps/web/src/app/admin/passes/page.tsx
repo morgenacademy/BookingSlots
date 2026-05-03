@@ -30,7 +30,7 @@ export default async function PassesAdmin({
         <h1 className="font-display text-3xl">Strippenkaarten</h1>
         <Link
           href="/admin/passes?new=1"
-          className="hoe-btn-primary !w-auto px-4 py-2 text-sm"
+          className="hoe-btn-sm"
         >
           + Nieuwe kaart
         </Link>
@@ -80,26 +80,26 @@ function PassForm({ pass }: { pass: Record<string, unknown> | null }) {
       {pass && <input type="hidden" name="id" value={String(pass.id)} />}
       <label className="flex flex-col gap-1">
         Naam
-        <input name="name" required defaultValue={v('name')} className="border rounded px-2 py-1" />
+        <input name="name" required defaultValue={v('name')} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Slug
-        <input name="slug" required defaultValue={v('slug')} className="border rounded px-2 py-1" />
+        <input name="slug" required defaultValue={v('slug')} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Prijs (€)
         <input name="price" type="number" step="0.01" required defaultValue={String(cents)}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Credits
         <input name="credits" type="number" required defaultValue={v('credits')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Geldig (dagen)
         <input name="validity_days" type="number" required defaultValue={v('validity_days')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex items-center gap-2 mt-6">
         <input
@@ -123,10 +123,10 @@ function PassForm({ pass }: { pass: Record<string, unknown> | null }) {
       </label>
       <label className="flex flex-col gap-1 col-span-2">
         Beschrijving
-        <textarea name="description" defaultValue={v('description')} className="border rounded px-2 py-1" />
+        <textarea name="description" defaultValue={v('description')} className="hoe-input w-full" />
       </label>
       <div className="col-span-2">
-        <button className="hoe-btn-primary !w-auto px-4 py-2">
+        <button className="hoe-btn-sm">
           Opslaan
         </button>
       </div>

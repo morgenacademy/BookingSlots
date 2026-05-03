@@ -26,7 +26,7 @@ export default async function SubsAdmin({
         <h1 className="font-display text-3xl">Abonnementen</h1>
         <Link
           href="/admin/subscriptions?new=1"
-          className="hoe-btn-primary !w-auto px-4 py-2 text-sm"
+          className="hoe-btn-sm"
         >
           + Nieuw abonnement
         </Link>
@@ -74,19 +74,19 @@ function SubForm({ sub }: { sub: Record<string, unknown> | null }) {
     <form action={saveSubscription} className="grid grid-cols-2 gap-4 text-sm">
       {sub && <input type="hidden" name="id" value={String(sub.id)} />}
       <label className="flex flex-col gap-1">
-        Naam<input name="name" required defaultValue={v('name')} className="border rounded px-2 py-1" />
+        Naam<input name="name" required defaultValue={v('name')} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
-        Slug<input name="slug" required defaultValue={v('slug')} className="border rounded px-2 py-1" />
+        Slug<input name="slug" required defaultValue={v('slug')} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Prijs (€)
         <input name="price" type="number" step="0.01" required defaultValue={String(cents)}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Interval
-        <select name="interval" defaultValue={v('interval') || 'month'} className="border rounded px-2 py-1">
+        <select name="interval" defaultValue={v('interval') || 'month'} className="hoe-input w-full">
           <option value="week">Week</option>
           <option value="month">Maand</option>
           <option value="year">Jaar</option>
@@ -95,7 +95,7 @@ function SubForm({ sub }: { sub: Record<string, unknown> | null }) {
       <label className="flex flex-col gap-1">
         Credits/periode (leeg = unlimited)
         <input name="credits_per_period" type="number" defaultValue={v('credits_per_period')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex items-center gap-2 mt-6">
         <input type="checkbox" name="unlimited" defaultChecked={Boolean(sub?.unlimited)} />
@@ -110,7 +110,7 @@ function SubForm({ sub }: { sub: Record<string, unknown> | null }) {
         Actief
       </label>
       <div className="col-span-2">
-        <button className="hoe-btn-primary !w-auto px-4 py-2">Opslaan</button>
+        <button className="hoe-btn-sm">Opslaan</button>
       </div>
     </form>
   );

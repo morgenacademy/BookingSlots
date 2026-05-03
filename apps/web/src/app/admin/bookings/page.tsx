@@ -56,7 +56,7 @@ export default async function BookingsAdmin({
       <form className="flex gap-3 items-end text-sm flex-wrap">
         <label className="flex flex-col gap-1">
           Filter op klas
-          <select name="class" defaultValue={sp.class ?? ''} className="border rounded px-2 py-1 min-w-[260px]">
+          <select name="class" defaultValue={sp.class ?? ''} className="hoe-input min-w-[260px]">
             <option value="">— Alle klassen —</option>
             {classes?.map((c) => {
               const a = Array.isArray(c.activity) ? c.activity[0] : c.activity;
@@ -70,14 +70,14 @@ export default async function BookingsAdmin({
         </label>
         <label className="flex flex-col gap-1">
           Status
-          <select name="status" defaultValue={sp.status ?? ''} className="border rounded px-2 py-1">
+          <select name="status" defaultValue={sp.status ?? ''} className="hoe-input w-full">
             <option value="">— Alle —</option>
             {Object.entries(STATUS_LABEL).map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
             ))}
           </select>
         </label>
-        <button className="border rounded px-4 py-1.5 hover:bg-gray-50">Filter</button>
+        <button className="hoe-btn-sm-ghost">Filter</button>
         {(sp.class || sp.status) && (
           <Link href="/admin/bookings" className="text-sm underline self-end mb-1">reset</Link>
         )}

@@ -37,7 +37,7 @@ export default async function ClassesAdmin({
         <h1 className="font-display text-3xl">Rooster</h1>
         <Link
           href="/admin/classes?new=1"
-          className="hoe-btn-primary !w-auto px-4 py-2 text-sm"
+          className="hoe-btn-sm"
         >
           + Nieuwe klas
         </Link>
@@ -115,21 +115,21 @@ function ClassForm({
       {cls && <input type="hidden" name="id" value={String(cls.id)} />}
       <label className="flex flex-col gap-1">
         Lestype
-        <select name="activity_id" required defaultValue={v('activity_id')} className="border rounded px-2 py-1">
+        <select name="activity_id" required defaultValue={v('activity_id')} className="hoe-input w-full">
           <option value="">—</option>
           {activities.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
         </select>
       </label>
       <label className="flex flex-col gap-1">
         Instructeur
-        <select name="instructor_id" defaultValue={v('instructor_id')} className="border rounded px-2 py-1">
+        <select name="instructor_id" defaultValue={v('instructor_id')} className="hoe-input w-full">
           <option value="">—</option>
           {instructors.map((i) => <option key={i.id} value={i.id}>{i.display_name}</option>)}
         </select>
       </label>
       <label className="flex flex-col gap-1">
         Ruimte
-        <select name="room_id" defaultValue={v('room_id')} className="border rounded px-2 py-1">
+        <select name="room_id" defaultValue={v('room_id')} className="hoe-input w-full">
           <option value="">—</option>
           {rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
         </select>
@@ -137,17 +137,17 @@ function ClassForm({
       <label className="flex flex-col gap-1">
         Capaciteit
         <input name="capacity" type="number" required defaultValue={v('capacity') || '12'}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Start
         <input name="starts_at" type="datetime-local" required defaultValue={dt('starts_at')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Eind
         <input name="ends_at" type="datetime-local" required defaultValue={dt('ends_at')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <label className="flex items-center gap-2">
         <input type="checkbox" name="is_off_peak" defaultChecked={Boolean(cls?.is_off_peak)} />
@@ -156,10 +156,10 @@ function ClassForm({
       <label className="flex flex-col gap-1">
         Max wachtlijst (leeg = studio-default)
         <input name="max_waitlist" type="number" defaultValue={v('max_waitlist')}
-          className="border rounded px-2 py-1" />
+          className="hoe-input w-full" />
       </label>
       <div className="col-span-2">
-        <button className="hoe-btn-primary !w-auto px-4 py-2">Opslaan</button>
+        <button className="hoe-btn-sm">Opslaan</button>
       </div>
     </form>
   );

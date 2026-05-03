@@ -25,7 +25,7 @@ export default async function ActivitiesAdmin({
         <h1 className="font-display text-3xl">Lestypes</h1>
         <Link
           href="/admin/activities?new=1"
-          className="hoe-btn-primary !w-auto px-4 py-2 text-sm"
+          className="hoe-btn-sm"
         >
           + Nieuw lestype
         </Link>
@@ -69,14 +69,14 @@ function ActivityForm({ act }: { act: Record<string, unknown> | null }) {
     <form action={saveActivity} className="grid grid-cols-2 gap-4 text-sm">
       {act && <input type="hidden" name="id" value={String(act.id)} />}
       <label className="flex flex-col gap-1">
-        Naam<input name="name" required defaultValue={v('name')} className="border rounded px-2 py-1" />
+        Naam<input name="name" required defaultValue={v('name')} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
-        Slug<input name="slug" required defaultValue={v('slug')} className="border rounded px-2 py-1" />
+        Slug<input name="slug" required defaultValue={v('slug')} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Type
-        <select name="kind" defaultValue={v('kind') || 'group'} className="border rounded px-2 py-1">
+        <select name="kind" defaultValue={v('kind') || 'group'} className="hoe-input w-full">
           <option value="group">Groepsles</option>
           <option value="appointment">1-op-1 afspraak</option>
           <option value="duo">DUO</option>
@@ -87,15 +87,15 @@ function ActivityForm({ act }: { act: Record<string, unknown> | null }) {
       <label className="flex flex-col gap-1">
         Credits per les
         <input name="default_credit_cost" type="number" required
-          defaultValue={v('default_credit_cost') || '1'} className="border rounded px-2 py-1" />
+          defaultValue={v('default_credit_cost') || '1'} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
         Duur (minuten)
         <input name="default_duration_minutes" type="number" required
-          defaultValue={v('default_duration_minutes') || '50'} className="border rounded px-2 py-1" />
+          defaultValue={v('default_duration_minutes') || '50'} className="hoe-input w-full" />
       </label>
       <div className="col-span-2">
-        <button className="hoe-btn-primary !w-auto px-4 py-2">Opslaan</button>
+        <button className="hoe-btn-sm">Opslaan</button>
       </div>
     </form>
   );
