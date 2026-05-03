@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BookingSlots embed example</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 960px; margin: 40px auto; padding: 0 16px; background: #faf7f5; color: #222; }
+    nav { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #ddd; background:#222; color:#fff; padding:16px; border-radius:8px; }
+    nav a { color:#fff; text-decoration:none; margin-right:16px; }
+    section { margin: 40px 0; }
+    h1 { font-family: serif; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#"><strong>House of Eve (test)</strong></a>
+    <!-- Bsport-style mount IDs auto-mount the login button. No JS call needed. -->
+    <div id="bsport-widget-desktop"></div>
+  </nav>
+
+  <section>
+    <h1>Prijzen</h1>
+    <div id="bookingslots-pricing"></div>
+  </section>
+
+  <section>
+    <h1>Rooster</h1>
+    <div id="bookingslots-calendar"></div>
+  </section>
+
+  <script src="/embed/widget.js"></script>
+  <script>
+    BookingSlots.mount({
+      parentElement: 'bookingslots-pricing',
+      widgetType: 'pricing',
+      studio: '00000000-0000-0000-0000-000000000001'
+    });
+    BookingSlots.mount({
+      parentElement: 'bookingslots-calendar',
+      widgetType: 'calendar',
+      studio: '00000000-0000-0000-0000-000000000001'
+    });
+  </script>
+</body>
+</html>

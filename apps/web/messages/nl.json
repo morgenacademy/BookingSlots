@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "schedule": "Rooster",
+    "pricing": "Prijzen",
+    "account": "Mijn account",
+    "login": "Inloggen",
+    "logout": "Uitloggen"
+  },
+  "auth": {
+    "title": "Inloggen of registreren",
+    "emailLabel": "E-mailadres",
+    "sendLink": "Stuur magic link",
+    "checkInbox": "Check je inbox voor de inloglink.",
+    "callbackError": "Inloggen mislukt. Probeer opnieuw."
+  },
+  "pricing": {
+    "title": "Creditbundels",
+    "subtitle": "Koop een bundel Credits en plan flexibel. Mix Reformer en Barre/Yoga op jouw manier.",
+    "buy": "Koop {name}",
+    "perCredit": "{price} per Credit",
+    "validityDays": "{days} dagen geldig",
+    "offPeakOnly": "Alleen daluren",
+    "subscriptions": "Abonnementen",
+    "subscribe": "Abonneer {name}",
+    "perMonth": "/maand"
+  },
+  "schedule": {
+    "title": "Rooster",
+    "book": "Boeken",
+    "booked": "Geboekt",
+    "full": "Vol",
+    "credits": "{n} credits",
+    "loginToBook": "Log in om te boeken"
+  },
+  "account": {
+    "title": "Mijn account",
+    "bookings": "Mijn boekingen",
+    "passes": "Mijn passes",
+    "subscriptions": "Abonnementen",
+    "profile": "Mijn profiel",
+    "invoices": "Facturen",
+    "wallet": "Tegoed",
+    "creditsRemaining": "{n} credits over",
+    "expires": "Verloopt {date}",
+    "noBookings": "Nog geen boekingen.",
+    "noPasses": "Nog geen passes."
+  },
+  "checkout": {
+    "redirecting": "Je wordt doorgestuurd naar de betaalpagina…",
+    "success": "Bedankt! Je betaling is gelukt.",
+    "failed": "De betaling is mislukt of geannuleerd.",
+    "viewAccount": "Naar mijn account"
+  }
+}

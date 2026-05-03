@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "schedule": "Schedule",
+    "pricing": "Pricing",
+    "account": "My account",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "auth": {
+    "title": "Login or register",
+    "emailLabel": "Email address",
+    "sendLink": "Send magic link",
+    "checkInbox": "Check your inbox for the login link.",
+    "callbackError": "Login failed. Please try again."
+  },
+  "pricing": {
+    "title": "Credit bundles",
+    "subtitle": "Buy a bundle of credits and plan flexibly. Mix Reformer and Barre/Yoga your way.",
+    "buy": "Buy {name}",
+    "perCredit": "{price} per credit",
+    "validityDays": "Valid for {days} days",
+    "offPeakOnly": "Off-peak only",
+    "subscriptions": "Subscriptions",
+    "subscribe": "Subscribe {name}",
+    "perMonth": "/month"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "book": "Book",
+    "booked": "Booked",
+    "full": "Full",
+    "credits": "{n} credits",
+    "loginToBook": "Login to book"
+  },
+  "account": {
+    "title": "My account",
+    "bookings": "My bookings",
+    "passes": "My passes",
+    "subscriptions": "Subscriptions",
+    "profile": "My profile",
+    "invoices": "Invoices",
+    "wallet": "Wallet",
+    "creditsRemaining": "{n} credits left",
+    "expires": "Expires {date}",
+    "noBookings": "No bookings yet.",
+    "noPasses": "No passes yet."
+  },
+  "checkout": {
+    "redirecting": "Redirecting to payment…",
+    "success": "Thanks! Your payment succeeded.",
+    "failed": "Payment failed or was cancelled.",
+    "viewAccount": "Go to my account"
+  }
+}
