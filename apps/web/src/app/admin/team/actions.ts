@@ -28,7 +28,7 @@ export async function inviteTeamMember(formData: FormData) {
   const displayName = String(formData.get('display_name') ?? '').trim();
 
   if (!email) redirect('/admin/team?err=email');
-  if (role === 'instructor' && !displayName) redirect('/admin/team?err=name');
+  if (!displayName) redirect('/admin/team?err=name');
 
   const admin = getSupabaseAdmin();
   const existing = await findUserByEmail(email);
@@ -39,9 +39,15 @@ export async function inviteTeamMember(formData: FormData) {
         { studio_id: STUDIO_ID, user_id: existing.id, role: 'manager' },
         { onConflict: 'studio_id,user_id' },
       );
+      // Set first_name on existing profile if it's still blank.
+      await admin
+        .from('profiles')
+        .update({ first_name: displayName })
+        .eq('id', existing.id)
+        .is('first_name', null);
     } else {
       await admin.from('studio_admin_invites').upsert(
-        { studio_id: STUDIO_ID, email, role: 'manager' },
+        { studio_id: STUDIO_ID, email, role: 'manager', display_name: displayName },
         { onConflict: 'studio_id,email' },
       );
       await sendInviteMail(email, '/admin');

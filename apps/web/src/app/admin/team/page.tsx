@@ -14,11 +14,11 @@ export default async function TeamAdmin({
   const supabase = await getSupabaseServer();
   const admin = getSupabaseAdmin();
 
-  const [{ data: admins }, { data: invites }, { data: instructors }, usersList] = await Promise.all([
+  const [{ data: admins }, { data: invites }, { data: instructors }, { data: profiles }, usersList] = await Promise.all([
     supabase.from('studio_admins').select('user_id, role, created_at').eq('studio_id', STUDIO_ID),
     supabase
       .from('studio_admin_invites')
-      .select('email, role, created_at')
+      .select('email, role, display_name, created_at')
       .eq('studio_id', STUDIO_ID)
       .order('created_at', { ascending: false }),
     supabase
@@ -26,11 +26,15 @@ export default async function TeamAdmin({
       .select('id, display_name, user_id, invite_email')
       .eq('studio_id', STUDIO_ID)
       .order('display_name'),
+    supabase.from('profiles').select('id, first_name, last_name'),
     admin.auth.admin.listUsers(),
   ]);
 
   const emailById = new Map(
     usersList.data?.users.map((u) => [u.id, u.email ?? '—']) ?? []
+  );
+  const nameById = new Map(
+    (profiles ?? []).map((p) => [p.id, [p.first_name, p.last_name].filter(Boolean).join(' ')]),
   );
 
   const errMessage = ({
@@ -63,12 +67,12 @@ export default async function TeamAdmin({
             </select>
           </label>
           <label className="flex flex-col gap-1">
-            E-mail
-            <input name="email" type="email" required className="hoe-input w-full" />
+            Naam
+            <input name="display_name" required className="hoe-input w-full" />
           </label>
           <label className="flex flex-col gap-1">
-            Naam <span className="text-xs text-gray-500">(verplicht bij instructeur)</span>
-            <input name="display_name" className="hoe-input w-full" />
+            E-mail
+            <input name="email" type="email" required className="hoe-input w-full" />
           </label>
           <div className="sm:col-span-2">
             <button className="hoe-btn-sm">Uitnodigen</button>
@@ -79,18 +83,22 @@ export default async function TeamAdmin({
       <section className="space-y-2">
         <h2 className="font-display text-xl">Admins</h2>
         <ul className="border rounded-2xl divide-y">
-          {admins?.map((a) => (
-            <li key={a.user_id} className="p-4 flex justify-between items-center">
-              <div>
-                <div className="font-medium">{emailById.get(a.user_id) ?? a.user_id}</div>
-                <div className="text-sm text-gray-600">Admin</div>
-              </div>
-              <form action={removeAdmin}>
-                <input type="hidden" name="user_id" value={a.user_id} />
-                <button className="text-red-700 underline text-sm">Verwijder</button>
-              </form>
-            </li>
-          ))}
+          {admins?.map((a) => {
+            const name = nameById.get(a.user_id);
+            const email = emailById.get(a.user_id) ?? a.user_id;
+            return (
+              <li key={a.user_id} className="p-4 flex justify-between items-center">
+                <div>
+                  <div className="font-medium">{name || email}</div>
+                  <div className="text-sm text-gray-600">{name ? email : 'Admin'}</div>
+                </div>
+                <form action={removeAdmin}>
+                  <input type="hidden" name="user_id" value={a.user_id} />
+                  <button className="text-red-700 underline text-sm">Verwijder</button>
+                </form>
+              </li>
+            );
+          })}
           {(!admins || admins.length === 0) && (
             <li className="p-6 text-gray-500 text-sm">Nog geen admins.</li>
           )}
@@ -133,9 +141,9 @@ export default async function TeamAdmin({
             {invites.map((i) => (
               <li key={i.email} className="p-4 flex justify-between items-center">
                 <div>
-                  <div className="font-medium">{i.email}</div>
+                  <div className="font-medium">{i.display_name || i.email}</div>
                   <div className="text-sm text-gray-600">
-                    Admin · uitgenodigd {new Date(i.created_at).toLocaleDateString('nl-NL')}
+                    {i.display_name ? `${i.email} · ` : ''}Admin · uitgenodigd {new Date(i.created_at).toLocaleDateString('nl-NL')}
                   </div>
                 </div>
                 <form action={cancelInvite}>

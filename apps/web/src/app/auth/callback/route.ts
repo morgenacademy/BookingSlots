@@ -68,13 +68,21 @@ export async function GET(request: NextRequest) {
 
       const { data: invites } = await admin
         .from('studio_admin_invites')
-        .select('studio_id, role')
+        .select('studio_id, role, display_name')
         .eq('email', lcEmail);
       if (invites?.length) {
         await admin.from('studio_admins').upsert(
           invites.map((i) => ({ studio_id: i.studio_id, user_id: user.id, role: i.role })),
           { onConflict: 'studio_id,user_id' },
         );
+        const inviteName = invites.find((i) => i.display_name)?.display_name as string | undefined;
+        if (inviteName) {
+          await admin
+            .from('profiles')
+            .update({ first_name: inviteName })
+            .eq('id', user.id)
+            .is('first_name', null);
+        }
         await admin.from('studio_admin_invites').delete().eq('email', lcEmail);
       }
 
