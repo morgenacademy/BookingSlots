@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import type { EmailOtpType } from '@supabase/supabase-js';
-import { getSupabaseServer } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+
+type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -10,11 +12,32 @@ export async function GET(request: NextRequest) {
   const type = url.searchParams.get('type') as EmailOtpType | null;
   const explicitNext = url.searchParams.get('next');
 
-  const supabase = await getSupabaseServer();
+  // Build the redirect response up front so verifyOtp can write session
+  // cookies on the response that's actually sent to the browser. Setting
+  // cookies via next/headers in route handlers doesn't propagate through
+  // NextResponse.redirect.
+  const redirectTo = (path: string) => {
+    const res = NextResponse.redirect(new URL(path, request.url));
+    return res;
+  };
 
-  // Two flows. PKCE delivers a `code` param and needs a verifier cookie set
-  // by signInWithOtp. The stateless token-hash flow (used by our email
-  // templates) just verifies the OTP server-side — works across browsers.
+  let response = redirectTo('/account');
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (toSet: CookieToSet[]) => {
+          for (const { name, value, options } of toSet) {
+            response.cookies.set(name, value, options);
+          }
+        },
+      },
+    },
+  );
+
   let error: { message: string } | null = null;
   if (code) {
     ({ error } = await supabase.auth.exchangeCodeForSession(code));
@@ -25,9 +48,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (error) {
-    return NextResponse.redirect(
-      new URL(`/login?error=${encodeURIComponent(error.message)}`, request.url),
-    );
+    return redirectTo(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -54,14 +75,9 @@ export async function GET(request: NextRequest) {
           invites.map((i) => ({ studio_id: i.studio_id, user_id: user.id, role: i.role })),
           { onConflict: 'studio_id,user_id' },
         );
-        await admin
-          .from('studio_admin_invites')
-          .delete()
-          .eq('email', lcEmail);
+        await admin.from('studio_admin_invites').delete().eq('email', lcEmail);
       }
 
-      // Same idea for instructor invites: claim the instructors row and
-      // clear the invite_email marker.
       await admin
         .from('instructors')
         .update({ user_id: user.id, invite_email: null })
@@ -70,8 +86,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Land users on their highest-privilege surface unless ?next= was set
-  // explicitly (eg. invite emails specify next=/instructor or /admin).
   let next = explicitNext;
   if (!next && user) {
     const [{ data: adm }, { count: instr }] = await Promise.all([
@@ -89,5 +103,11 @@ export async function GET(request: NextRequest) {
     next = adm ? '/admin' : instr ? '/instructor' : '/account';
   }
 
-  return NextResponse.redirect(new URL(next ?? '/account', request.url));
+  // Preserve cookies that verifyOtp set on `response` while updating the URL.
+  const finalUrl = new URL(next ?? '/account', request.url);
+  const final = NextResponse.redirect(finalUrl);
+  for (const c of response.cookies.getAll()) {
+    final.cookies.set(c.name, c.value, c);
+  }
+  return final;
 }
