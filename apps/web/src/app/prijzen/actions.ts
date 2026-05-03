@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { PaymentMethod } from '@mollie/api-client';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { mollie, siteUrl } from '@/lib/mollie';
@@ -74,7 +75,7 @@ export async function addPassToCartAndCheckout(formData: FormData) {
     redirectUrl: `${siteUrl()}/checkout/return?order=${order.id}`,
     webhookUrl: `${siteUrl()}/api/mollie/webhook`,
     metadata: { order_id: order.id },
-    method: ['ideal', 'bancontact', 'creditcard'],
+    method: [PaymentMethod.ideal, PaymentMethod.bancontact, PaymentMethod.creditcard],
   });
 
   await admin
