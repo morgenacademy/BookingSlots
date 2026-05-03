@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Nav } from '@/components/nav';
@@ -56,30 +57,55 @@ export default async function AccountPage() {
         </header>
 
         <section>
-          <h2 className="font-display text-2xl mb-3">{t('passes')}</h2>
+          <div className="flex justify-between items-baseline mb-3">
+            <h2 className="font-display text-2xl">{t('passes')}</h2>
+            <Link href="/prijzen" className="text-sm underline hover:no-underline">
+              {passes && passes.length > 0 ? 'Verleng of vul aan →' : 'Bekijk prijzen →'}
+            </Link>
+          </div>
           {passes && passes.length > 0 ? (
             <ul className="border border-hoe-line rounded-3xl divide-y bg-white">
               {passes.map((up) => {
                 const p = Array.isArray(up.pass) ? up.pass[0] : up.pass;
+                const lowCredits = up.credits_remaining <= 2;
+                const expiresSoon = up.expires_at &&
+                  new Date(up.expires_at).getTime() - Date.now() < 14 * 86400000;
                 return (
-                  <li key={up.id} className="p-4 flex justify-between">
+                  <li key={up.id} className="p-4 flex justify-between items-center gap-4">
                     <span>{p?.name}</span>
-                    <span className="text-sm text-gray-600">
-                      {t('creditsRemaining', { n: up.credits_remaining })}
-                      {up.expires_at &&
-                        ` · ${t('expires', { date: fmtDate(up.expires_at, locale) })}`}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-sm ${lowCredits || expiresSoon ? 'text-amber-700' : 'text-gray-600'}`}>
+                        {t('creditsRemaining', { n: up.credits_remaining })}
+                        {up.expires_at &&
+                          ` · ${t('expires', { date: fmtDate(up.expires_at, locale) })}`}
+                      </span>
+                      {(lowCredits || expiresSoon) && (
+                        <Link href="/prijzen" className="hoe-btn-sm-ghost">
+                          Vul aan
+                        </Link>
+                      )}
+                    </div>
                   </li>
                 );
               })}
             </ul>
           ) : (
-            <p className="text-gray-500">{t('noPasses')}</p>
+            <div className="border border-hoe-line border-dashed rounded-3xl p-8 bg-white text-center space-y-3">
+              <p className="text-gray-500">{t('noPasses')}</p>
+              <Link href="/prijzen" className="hoe-btn-sm">
+                Koop een strippenkaart
+              </Link>
+            </div>
           )}
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-3">{t('bookings')}</h2>
+          <div className="flex justify-between items-baseline mb-3">
+            <h2 className="font-display text-2xl">{t('bookings')}</h2>
+            <Link href="/rooster" className="text-sm underline hover:no-underline">
+              Naar rooster →
+            </Link>
+          </div>
           {bookings && bookings.length > 0 ? (
             <ul className="border border-hoe-line rounded-3xl divide-y bg-white">
               {bookings.map((b) => {
@@ -104,7 +130,12 @@ export default async function AccountPage() {
               })}
             </ul>
           ) : (
-            <p className="text-gray-500">{t('noBookings')}</p>
+            <div className="border border-hoe-line border-dashed rounded-3xl p-8 bg-white text-center space-y-3">
+              <p className="text-gray-500">{t('noBookings')}</p>
+              <Link href="/rooster" className="hoe-btn-sm">
+                Boek een les
+              </Link>
+            </div>
           )}
         </section>
 
