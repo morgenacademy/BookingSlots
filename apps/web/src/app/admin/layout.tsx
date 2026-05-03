@@ -8,11 +8,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/admin');
 
-  const { count } = await supabase
+  const { data: roleRow } = await supabase
     .from('studio_admins')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
-  if (!count) redirect('/account');
+    .select('role')
+    .eq('user_id', user.id)
+    .in('role', ['owner', 'manager'])
+    .maybeSingle();
+  if (!roleRow) {
+    // Staff (instructor-only) and unknown users go to their own surfaces.
+    const { count: instr } = await supabase
+      .from('instructors')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+    redirect(instr ? '/instructor' : '/account');
+  }
 
   return (
     <>

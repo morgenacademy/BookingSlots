@@ -43,10 +43,12 @@ export async function GET(request: NextRequest) {
 
     if (user.email) {
       const admin = getSupabaseAdmin();
+      const lcEmail = user.email.toLowerCase();
+
       const { data: invites } = await admin
         .from('studio_admin_invites')
         .select('studio_id, role')
-        .eq('email', user.email.toLowerCase());
+        .eq('email', lcEmail);
       if (invites?.length) {
         await admin.from('studio_admins').upsert(
           invites.map((i) => ({ studio_id: i.studio_id, user_id: user.id, role: i.role })),
@@ -55,8 +57,16 @@ export async function GET(request: NextRequest) {
         await admin
           .from('studio_admin_invites')
           .delete()
-          .eq('email', user.email.toLowerCase());
+          .eq('email', lcEmail);
       }
+
+      // Same idea for instructor invites: claim the instructors row and
+      // clear the invite_email marker.
+      await admin
+        .from('instructors')
+        .update({ user_id: user.id, invite_email: null })
+        .eq('invite_email', lcEmail)
+        .is('user_id', null);
     }
   }
 
