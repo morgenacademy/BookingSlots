@@ -107,7 +107,17 @@ End-to-end Mollie test geverifieerd: factuur HOE-2026-00001 (€105 Off Peak 15)
 - **Bsport-importer**: zodra Lizzy haar Bsport-login deelt, kunnen we members, klassen en lopende strippenkaarten/abonnementen overzetten zodat klanten niet vanaf nul beginnen. Onderzoek welk pad: officiële API (gated achter Bsport agreement, base `api-docs.dev.bsport.io`), CSV-export, of als laatste redmiddel een scrape-script. Schrijf dit als `scripts/import-bsport.ts` met service-role client.
 
 ### Belangrijk feature-werk
-- **Instructeur-rol** (Lizzy's vraag: "instructeurs moeten ook kunnen inloggen, hun lessen zien, wie er komt"):
+- **Foto upload bug** in `/admin/instructors` bewerken — client-side exception bij submit met file. Vermoedelijk encType-issue op de server-action form, of een hydratiebug na de redirect. Eerst console-log opvragen, dan fix.
+- **Cancel-policy + boete-flow** (Lizzy):
+  - Klant kan zichzelf uitschrijven via `/account` (knop bestaat al, deadline-check via `studios.cancel_deadline_minutes` werkt). **Lizzy wil deadline op 8u voor lesstart.** Setting in `/admin/studio` straks.
+  - Te-laat-cancel of no-show: credit **niet** terug (huidige gedrag is OK).
+  - **Unlimited-abonnees**: 3x late cancel/no-show → **€15 boete** (de eerste 2 keer is alleen waarschuwing). Vereist:
+    - kolom `late_cancel_strikes int` op `user_subscriptions` of telling-tabel
+    - bij booking-cancel buiten deadline of no-show-marker: increment counter
+    - mail bij strike 1 en 2 ("waarschuwing"), bij strike 3 een Mollie-charge of openstaande post in account
+    - reset counter na elke billing-period? te bespreken
+- **Halve credits** (Lizzy): credits-velden moeten decimal kunnen zijn (0.5, 1.5). Vandaag zijn `credits_remaining`, `credits`, `default_credit_cost`, `credits_per_period` allemaal `int`. Migratie naar `numeric(5,1)` of `numeric(5,2)` op alle credit-kolommen + UI accepteert decimalen + booking-cost-aftrek werkt al via simpele optelling.
+- **Instructeur-rol** (al gebouwd, polish-werk):
   1. Migratie: `instructors.user_id` (FK naar `auth.users`) + RLS-policy "instructor reads own classes".
   2. `/admin/instructors` formulier krijgt e-mail-koppel + invite (zelfde patroon als `/admin/team`).
   3. Nieuwe `/instructor` route: lijst van eigen aankomende klassen + per klas een attendance-pagina met deelnemerslijst (naam, e-mail, status, no-show-knop).
