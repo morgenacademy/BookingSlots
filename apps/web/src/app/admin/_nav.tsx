@@ -33,7 +33,10 @@ const GROUPS: Group[] = [
   },
   {
     label: 'Beheer',
-    items: [{ href: '/admin/team', label: 'Team' }],
+    items: [
+      { href: '/admin/team', label: 'Team' },
+      { href: '/admin/studio', label: 'Studio-instellingen' },
+    ],
   },
 ];
 

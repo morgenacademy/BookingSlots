@@ -93,7 +93,7 @@ function PassForm({ pass }: { pass: Record<string, unknown> | null }) {
       </label>
       <label className="flex flex-col gap-1">
         Credits
-        <input name="credits" type="number" required defaultValue={v('credits')}
+        <input name="credits" type="number" step="0.5" min="0" required defaultValue={v('credits')}
           className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">

@@ -15,7 +15,7 @@ export default async function AccountPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/account');
 
-  const [{ data: profile }, { data: bookings }, { data: passes }, { data: orders }] =
+  const [{ data: profile }, { data: bookings }, { data: passes }, { data: orders }, { data: penalties }, { data: subs }] =
     await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase
@@ -43,6 +43,17 @@ export default async function AccountPage() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20),
+      supabase
+        .from('subscription_penalties')
+        .select('id, amount_eur_cents, reason, status, created_at')
+        .eq('user_id', user.id)
+        .eq('status', 'open')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('user_subscriptions')
+        .select('id, late_cancel_strikes, status, subscription:subscriptions(name, unlimited)')
+        .eq('user_id', user.id)
+        .eq('status', 'active'),
     ]);
 
   return (
@@ -55,6 +66,39 @@ export default async function AccountPage() {
             {t('wallet')}: <strong>{eur(profile?.wallet_eur_cents ?? 0)}</strong>
           </p>
         </header>
+
+        {(penalties && penalties.length > 0) && (
+          <section className="border border-red-200 bg-red-50 rounded-3xl p-5 space-y-2">
+            <h2 className="font-display text-lg">Openstaande boetes</h2>
+            <ul className="text-sm space-y-1">
+              {penalties.map((p) => (
+                <li key={p.id} className="flex justify-between">
+                  <span>{p.reason}</span>
+                  <strong>{eur(p.amount_eur_cents)}</strong>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-red-700">
+              We sturen je hierover een betaalverzoek. Vragen? Mail ons.
+            </p>
+          </section>
+        )}
+
+        {subs?.some((s) => {
+          const tmpl = Array.isArray(s.subscription) ? s.subscription[0] : s.subscription;
+          return tmpl?.unlimited && (s.late_cancel_strikes ?? 0) > 0 && (s.late_cancel_strikes ?? 0) < 3;
+        }) && (
+          <section className="border border-amber-200 bg-amber-50 rounded-3xl p-5 text-sm">
+            <h2 className="font-display text-lg mb-1">Waarschuwing late annulering</h2>
+            <p>
+              Je hebt {subs?.find((s) => {
+                const t = Array.isArray(s.subscription) ? s.subscription[0] : s.subscription;
+                return t?.unlimited;
+              })?.late_cancel_strikes} van 3 strikes voor late annulering of no-show op je
+              unlimited-abonnement. Bij de derde strike volgt €&nbsp;15 boete.
+            </p>
+          </section>
+        )}
 
         <section>
           <div className="flex justify-between items-baseline mb-3">

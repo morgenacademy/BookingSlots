@@ -49,7 +49,7 @@ export async function bookClass(formData: FormData) {
       pass:passes(id, off_peak_only, allowed_activity_ids)
     `)
     .eq('user_id', user.id)
-    .gt('credits_remaining', cost - 1)
+    .gte('credits_remaining', cost)
     .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
     .order('expires_at', { ascending: true });
 
@@ -117,7 +117,7 @@ export async function cancelBooking(formData: FormData) {
     .single();
 
   const startsAt = new Date(cls!.starts_at).getTime();
-  const deadlineMs = (studio?.cancel_deadline_minutes ?? 360) * 60 * 1000;
+  const deadlineMs = (studio?.cancel_deadline_minutes ?? 480) * 60 * 1000;
   const inTime = startsAt - Date.now() > deadlineMs;
 
   await admin
@@ -140,6 +140,10 @@ export async function cancelBooking(formData: FormData) {
         .update({ credits_remaining: up.credits_remaining + b.credits_used })
         .eq('id', b.user_pass_id);
     }
+  } else if (!inTime) {
+    // Late cancel — register a strike for unlimited subs and (after the
+    // third) materialise a EUR 15 fine.
+    await registerStrike(user.id, b.user_pass_id, studio_id, admin);
   }
 
   revalidatePath('/account');
@@ -242,6 +246,87 @@ async function notifyWaitlist(classId: string, admin: ReturnType<typeof getSupab
         <p><a href="${claimUrl}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;border-radius:8px">Claim mijn plek</a></p>
         <p>Als de plek al weg is laten we dat weten zodra je klikt.</p>
       `,
+    });
+  }
+}
+
+const STRIKE_LIMIT = 3;
+const STRIKE_FINE_CENTS = 1500;
+
+async function registerStrike(
+  userId: string,
+  userPassId: string | null,
+  studioId: string | null | undefined,
+  admin: ReturnType<typeof getSupabaseAdmin>,
+) {
+  if (!userPassId || !studioId) return;
+
+  // Only unlimited subscriptions get strikes; regular passes already lose
+  // the credit so no extra penalty.
+  const { data: pass } = await admin
+    .from('user_passes')
+    .select('user_subscription_id')
+    .eq('id', userPassId)
+    .maybeSingle();
+  if (!pass?.user_subscription_id) return;
+
+  const { data: sub } = await admin
+    .from('user_subscriptions')
+    .select(`
+      id, late_cancel_strikes,
+      template:subscriptions(unlimited)
+    `)
+    .eq('id', pass.user_subscription_id)
+    .single();
+  if (!sub) return;
+
+  const tmpl = Array.isArray(sub.template) ? sub.template[0] : sub.template;
+  if (!tmpl?.unlimited) return;
+
+  const newCount = (sub.late_cancel_strikes ?? 0) + 1;
+  await admin
+    .from('user_subscriptions')
+    .update({ late_cancel_strikes: newCount })
+    .eq('id', sub.id);
+
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('email, first_name')
+    .eq('id', userId)
+    .single();
+
+  if (newCount >= STRIKE_LIMIT) {
+    await admin.from('subscription_penalties').insert({
+      studio_id: studioId,
+      user_subscription_id: sub.id,
+      user_id: userId,
+      amount_eur_cents: STRIKE_FINE_CENTS,
+      reason: `Late cancel / no-show #${newCount}`,
+    });
+    if (profile?.email) {
+      await sendMail({
+        to: profile.email,
+        toName: profile.first_name ?? undefined,
+        subject: 'Boete late annulering — House of Eve',
+        html: `<p>Hi ${profile.first_name ?? ''},</p>
+          <p>Je hebt voor de derde keer te laat geannuleerd of bent niet komen
+          opdagen. Conform onze afspraken brengen we daarom <strong>€&nbsp;15</strong>
+          in rekening. We sturen je hierover een aparte betaalverzoek.</p>
+          <p>Tot snel in de studio.</p>`,
+      });
+    }
+  } else if (profile?.email) {
+    const remaining = STRIKE_LIMIT - newCount;
+    await sendMail({
+      to: profile.email,
+      toName: profile.first_name ?? undefined,
+      subject: 'Waarschuwing late annulering — House of Eve',
+      html: `<p>Hi ${profile.first_name ?? ''},</p>
+        <p>Je hebt zojuist te laat geannuleerd. Bij een unlimited-abonnement
+        geldt: na drie keer te laat annuleren of niet komen opdagen brengen
+        we <strong>€&nbsp;15</strong> in rekening.</p>
+        <p>Dit was waarschuwing ${newCount} van ${STRIKE_LIMIT - 1}. Nog
+        ${remaining} keer en je krijgt een boete.</p>`,
     });
   }
 }

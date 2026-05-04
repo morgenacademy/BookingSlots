@@ -50,23 +50,64 @@ export async function markNoShow(formData: FormData) {
   const classId = await assertCanMark(bookingId);
   const admin = getSupabaseAdmin();
 
-  // Penalise: pull a credit from the user's active pass for this booking.
   const { data: b } = await admin
     .from('bookings')
-    .select('user_pass_id, credits_used, status')
+    .select('user_id, user_pass_id, studio_id')
     .eq('id', bookingId)
     .single();
+
   await admin.from('bookings').update({ status: 'no_show' }).eq('id', bookingId);
 
-  // If the booking was previously booked we already debited the pass at
-  // booking time; no extra penalty for now (can be revisited per-studio).
-  // We just mark the status.
-  void b;
+  // Strip and (on the third) charge an unlimited subscriber for skipping.
+  if (b?.user_id && b.user_pass_id && b.studio_id) {
+    await registerStrikeForNoShow(b.user_id, b.user_pass_id, b.studio_id, admin);
+  }
 
-  // Use STUDIO_ID to silence linter if unused elsewhere (keeps single source).
   void STUDIO_ID;
   revalidatePath(`/instructor/class/${classId}`);
   redirect(`/instructor/class/${classId}`);
+}
+
+const STRIKE_LIMIT = 3;
+const STRIKE_FINE_CENTS = 1500;
+
+async function registerStrikeForNoShow(
+  userId: string,
+  userPassId: string,
+  studioId: string,
+  admin: ReturnType<typeof getSupabaseAdmin>,
+) {
+  const { data: pass } = await admin
+    .from('user_passes')
+    .select('user_subscription_id')
+    .eq('id', userPassId)
+    .maybeSingle();
+  if (!pass?.user_subscription_id) return;
+
+  const { data: sub } = await admin
+    .from('user_subscriptions')
+    .select('id, late_cancel_strikes, template:subscriptions(unlimited)')
+    .eq('id', pass.user_subscription_id)
+    .single();
+  if (!sub) return;
+  const tmpl = Array.isArray(sub.template) ? sub.template[0] : sub.template;
+  if (!tmpl?.unlimited) return;
+
+  const newCount = (sub.late_cancel_strikes ?? 0) + 1;
+  await admin
+    .from('user_subscriptions')
+    .update({ late_cancel_strikes: newCount })
+    .eq('id', sub.id);
+
+  if (newCount >= STRIKE_LIMIT) {
+    await admin.from('subscription_penalties').insert({
+      studio_id: studioId,
+      user_subscription_id: sub.id,
+      user_id: userId,
+      amount_eur_cents: STRIKE_FINE_CENTS,
+      reason: `No-show #${newCount}`,
+    });
+  }
 }
 
 export async function unmark(formData: FormData) {

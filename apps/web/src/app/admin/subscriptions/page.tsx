@@ -94,7 +94,7 @@ function SubForm({ sub }: { sub: Record<string, unknown> | null }) {
       </label>
       <label className="flex flex-col gap-1">
         Credits/periode (leeg = unlimited)
-        <input name="credits_per_period" type="number" defaultValue={v('credits_per_period')}
+        <input name="credits_per_period" type="number" step="0.5" min="0" defaultValue={v('credits_per_period')}
           className="hoe-input w-full" />
       </label>
       <label className="flex items-center gap-2 mt-6">

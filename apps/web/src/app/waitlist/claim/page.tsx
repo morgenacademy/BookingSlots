@@ -48,7 +48,7 @@ async function claim(bookingId: string, token: string): Promise<Result> {
     .from('user_passes')
     .select('id, credits_remaining, expires_at, pass:passes(off_peak_only, allowed_activity_ids)')
     .eq('user_id', user.id)
-    .gt('credits_remaining', cost - 1)
+    .gte('credits_remaining', cost)
     .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
     .order('expires_at', { ascending: true });
 

@@ -86,7 +86,7 @@ function ActivityForm({ act }: { act: Record<string, unknown> | null }) {
       </label>
       <label className="flex flex-col gap-1">
         Credits per les
-        <input name="default_credit_cost" type="number" required
+        <input name="default_credit_cost" type="number" step="0.5" min="0" required
           defaultValue={v('default_credit_cost') || '1'} className="hoe-input w-full" />
       </label>
       <label className="flex flex-col gap-1">
