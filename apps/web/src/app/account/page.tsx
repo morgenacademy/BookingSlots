@@ -188,11 +188,11 @@ export default async function AccountPage() {
                           <input type="hidden" name="booking_id" value={b.id} />
                           <button className="text-sm underline whitespace-nowrap">Annuleren</button>
                         </form>
-                        <div className={`text-xs mt-1 ${lateCancel ? 'text-red-700' : 'text-gray-500'}`}>
-                          {lateCancel
-                            ? 'Binnen ' + deadlineHours + 'u — credits niet retour'
-                            : 'Tot ' + deadlineHours + 'u vooraf: credits retour'}
-                        </div>
+                        {lateCancel && (
+                          <div className="text-xs mt-1 text-red-700">
+                            Binnen {deadlineHours}u — credits niet retour
+                          </div>
+                        )}
                       </div>
                     )}
                   </li>
