@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { getSupabaseServer } from '@/lib/supabase/server';
-import { fmtDateTime } from '@/lib/date';
+import { fmtDateTime, fmtCredits } from '@/lib/date';
 
 const STUDIO_ID = process.env.NEXT_PUBLIC_DEFAULT_STUDIO_ID!;
 
@@ -115,7 +115,7 @@ export default async function BookingsAdmin({
                       <span className="text-xs text-gray-500"> · #{b.waitlist_position}</span>
                     )}
                   </td>
-                  <td className="p-3">{b.credits_used}</td>
+                  <td className="p-3">{fmtCredits(b.credits_used)}</td>
                   <td className="p-3 text-gray-700">{fmtDateTime(b.created_at, locale)}</td>
                 </tr>
               );

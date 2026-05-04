@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { Nav } from '@/components/nav';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { addPassToCartAndCheckout, subscribe } from './actions';
+import { fmtCredits } from '@/lib/date';
 
 const STUDIO_ID = process.env.NEXT_PUBLIC_DEFAULT_STUDIO_ID!;
 const eur = (cents: number) => `€ ${(cents / 100).toFixed(2).replace('.', ',')}`;
@@ -98,7 +99,7 @@ export default async function PricingPage() {
               {subs.map((s) => (
                 <article key={s.id} className="hoe-card">
                   <div className="hoe-pill self-center">
-                    {s.unlimited ? 'Onbeperkt boeken' : `${s.credits_per_period} Credits / maand`}
+                    {s.unlimited ? 'Onbeperkt boeken' : `${fmtCredits(s.credits_per_period)} Credits / maand`}
                   </div>
                   <h3 className="font-display text-2xl mt-2">{s.name}</h3>
                   <p className="hoe-price">
@@ -107,7 +108,7 @@ export default async function PricingPage() {
                   </p>
                   <ul className="hoe-check space-y-1 text-sm text-hoe-fg/90 mt-1">
                     {!s.unlimited && (
-                      <li>{s.credits_per_period} Credits per maand</li>
+                      <li>{fmtCredits(s.credits_per_period)} Credits per maand</li>
                     )}
                     <li>Reformer = 3 Credits</li>
                     <li>Barre/Yoga = 2 Credits</li>

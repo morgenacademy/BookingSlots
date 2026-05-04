@@ -20,3 +20,12 @@ export function fmtDateTime(iso: string, locale: string) {
     minute: '2-digit',
   });
 }
+
+// European number format: 0,5 / 1,5 / 10. Trims trailing .0 so 1.0 -> "1".
+export function fmtCredits(n: number | null | undefined, locale = 'nl-NL') {
+  if (n == null) return '0';
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(Number(n));
+}

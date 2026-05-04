@@ -81,6 +81,16 @@ async function handleOrderPayment(payment: Payment, orderId: string, admin: Admi
 
   if (status !== 'paid') return;
 
+  // Penalty payments — mark the matching subscription_penalties row as paid.
+  const meta = payment.metadata as Record<string, string> | null;
+  if (meta?.kind === 'penalty' && meta.penalty_id) {
+    await admin
+      .from('subscription_penalties')
+      .update({ status: 'paid' })
+      .eq('id', meta.penalty_id);
+    return; // no pass-materialisation needed for fines
+  }
+
   const { data: items } = await admin
     .from('order_items')
     .select('id, item_kind, pass_id, quantity')

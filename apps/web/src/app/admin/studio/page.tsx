@@ -45,16 +45,6 @@ export default async function StudioSettings({
         </label>
 
         <label className="flex flex-col gap-1">
-          No-show boete (credits)
-          <input name="no_show_penalty_credits" type="number" step="0.5" min="0" required
-            defaultValue={studio?.no_show_penalty_credits ?? 1}
-            className="hoe-input w-full" />
-          <span className="text-xs text-gray-500">
-            Aantal credits dat verloren gaat bij niet komen opdagen.
-          </span>
-        </label>
-
-        <label className="flex flex-col gap-1">
           Max wachtlijst per klas
           <input name="default_max_waitlist" type="number" min="0" required
             defaultValue={studio?.default_max_waitlist ?? 10}

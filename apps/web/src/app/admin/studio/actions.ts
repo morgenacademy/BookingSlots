@@ -13,7 +13,6 @@ export async function saveStudio(formData: FormData) {
     .update({
       name: String(formData.get('name')),
       cancel_deadline_minutes: Number(formData.get('cancel_deadline_minutes')),
-      no_show_penalty_credits: Number(formData.get('no_show_penalty_credits')),
       default_max_waitlist: Number(formData.get('default_max_waitlist')),
       invoice_number_prefix: String(formData.get('invoice_number_prefix')),
       vat_number: (formData.get('vat_number') as string) || null,

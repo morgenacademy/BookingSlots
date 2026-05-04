@@ -5,6 +5,7 @@ import { Nav } from '@/components/nav';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { fmtDate, fmtDateTime } from '@/lib/date';
 import { cancelBooking } from '@/app/rooster/actions';
+import { payPenalty } from './actions';
 
 const eur = (cents: number) => `€ ${(cents / 100).toFixed(2).replace('.', ',')}`;
 
@@ -68,19 +69,25 @@ export default async function AccountPage() {
         </header>
 
         {(penalties && penalties.length > 0) && (
-          <section className="border border-red-200 bg-red-50 rounded-3xl p-5 space-y-2">
+          <section className="border border-red-200 bg-red-50 rounded-3xl p-5 space-y-3">
             <h2 className="font-display text-lg">Openstaande boetes</h2>
-            <ul className="text-sm space-y-1">
+            <ul className="text-sm divide-y divide-red-200">
               {penalties.map((p) => (
-                <li key={p.id} className="flex justify-between">
-                  <span>{p.reason}</span>
-                  <strong>{eur(p.amount_eur_cents)}</strong>
+                <li key={p.id} className="py-2 flex justify-between items-center gap-3">
+                  <div>
+                    <div>{p.reason}</div>
+                    <div className="text-xs text-red-700/80">{fmtDate(p.created_at, locale)}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <strong>{eur(p.amount_eur_cents)}</strong>
+                    <form action={payPenalty}>
+                      <input type="hidden" name="penalty_id" value={p.id} />
+                      <button className="hoe-btn-sm">Betaal</button>
+                    </form>
+                  </div>
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-red-700">
-              We sturen je hierover een betaalverzoek. Vragen? Mail ons.
-            </p>
           </section>
         )}
 
