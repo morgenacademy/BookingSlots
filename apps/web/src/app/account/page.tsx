@@ -16,7 +16,7 @@ export default async function AccountPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/account');
 
-  const [{ data: profile }, { data: bookings }, { data: passes }, { data: orders }, { data: penalties }, { data: subs }] =
+  const [{ data: profile }, { data: bookings }, { data: passes }, { data: orders }, { data: penalties }, { data: subs }, { data: studio }] =
     await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase
@@ -55,7 +55,15 @@ export default async function AccountPage() {
         .select('id, late_cancel_strikes, status, subscription:subscriptions(name, unlimited)')
         .eq('user_id', user.id)
         .eq('status', 'active'),
+      supabase
+        .from('studios')
+        .select('cancel_deadline_minutes')
+        .eq('id', process.env.NEXT_PUBLIC_DEFAULT_STUDIO_ID!)
+        .single(),
     ]);
+
+  const deadlineMin = studio?.cancel_deadline_minutes ?? 480;
+  const deadlineHours = Math.round(deadlineMin / 60);
 
   return (
     <>
@@ -162,19 +170,30 @@ export default async function AccountPage() {
               {bookings.map((b) => {
                 const cls = Array.isArray(b.class) ? b.class[0] : b.class;
                 const a = cls && (Array.isArray(cls.activity) ? cls.activity[0] : cls.activity);
+                const minutesUntilStart = cls
+                  ? Math.round((new Date(cls.starts_at).getTime() - Date.now()) / 60000)
+                  : 0;
+                const lateCancel = minutesUntilStart > 0 && minutesUntilStart < deadlineMin;
                 return (
-                  <li key={b.id} className="p-4 flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">{a?.name}</div>
+                  <li key={b.id} className="p-4 flex justify-between items-center gap-3">
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{a?.name}</div>
                       <div className="text-sm text-gray-600">
                         {cls && fmtDateTime(cls.starts_at, locale)} · {b.status}
                       </div>
                     </div>
                     {b.status === 'booked' && (
-                      <form action={cancelBooking}>
-                        <input type="hidden" name="booking_id" value={b.id} />
-                        <button className="text-sm underline">Annuleren</button>
-                      </form>
+                      <div className="text-right">
+                        <form action={cancelBooking}>
+                          <input type="hidden" name="booking_id" value={b.id} />
+                          <button className="text-sm underline whitespace-nowrap">Annuleren</button>
+                        </form>
+                        <div className={`text-xs mt-1 ${lateCancel ? 'text-red-700' : 'text-gray-500'}`}>
+                          {lateCancel
+                            ? 'Binnen ' + deadlineHours + 'u — credits niet retour'
+                            : 'Tot ' + deadlineHours + 'u vooraf: credits retour'}
+                        </div>
+                      </div>
                     )}
                   </li>
                 );
